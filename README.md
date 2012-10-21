@@ -1,4 +1,4 @@
-IvyMedia
+IvyVideo
 ========
 
-IvyMedia for video encoder/decoder
+Video encoder/decoder/engine of IvyMedia framework 
