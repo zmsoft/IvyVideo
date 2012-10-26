@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="big5"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="9.00"
 	Name="FFMpegWrapper"
 	ProjectGUID="{38B2B370-B30A-4E12-BD69-8E60A348DBE3}"
 	RootNamespace="FFMpegWrapper_dynamic"
 	Keyword="Win32Proj"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -64,6 +65,8 @@
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -83,9 +86,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -140,6 +140,8 @@
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -161,9 +163,6 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -177,19 +176,19 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\src\FFMpegBitmapConverter.cpp"
+				RelativePath="..\..\src\FFMpegBitmapConverter.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\src\FFMpegCanvas.cpp"
+				RelativePath="..\..\src\FFMpegCanvas.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\src\FFMpegCodecDecoder.cpp"
+				RelativePath="..\..\src\FFMpegCodecDecoder.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\src\FFMpegCodecEncoder.cpp"
+				RelativePath="..\..\src\FFMpegCodecEncoder.cpp"
 				>
 			</File>
 		</Filter>
@@ -199,39 +198,43 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\include\FFMpegAudioConverter.h"
+				RelativePath="..\..\include\FFMpegAudioConverter.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\FFMpegBitmapConverter.h"
+				RelativePath="..\..\include\FFMpegBitmapConverter.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\FFMpegCanvas.h"
+				RelativePath="..\..\include\FFMpegCanvas.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\FFMpegCodecDecoder.h"
+				RelativePath="..\..\include\FFMpegCodecDecoder.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\FFMpegCodecEncoder.h"
+				RelativePath="..\..\include\FFMpegCodecEncoder.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\FFMpegDecoder.h"
+				RelativePath="..\..\include\FFMpegDecoder.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\FFMpegEncoder.h"
+				RelativePath="..\..\include\FFMpegDemuxer.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\FFMpegReSampler.h"
+				RelativePath="..\..\include\FFMpegEncoder.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\FFMpegVideoDecoder.h"
+				RelativePath="..\..\include\FFMpegReSampler.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\FFMpegVideoDecoder.h"
 				>
 			</File>
 			<File
@@ -239,31 +242,35 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\FFMpegWrapperAPI.h"
+				RelativePath="..\..\include\FFMpegWrapperAPI.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\FPSCounter.h"
+				RelativePath="..\..\include\FPSCounter.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\myFFMpeg.h"
+				RelativePath="..\..\include\myFFMpeg.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\RealFFMpegBitmapConverter.h"
+				RelativePath="..\..\include\RealFFMpegBitmapConverter.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\RealFFMpegCanvas.h"
+				RelativePath="..\..\include\RealFFMpegCanvas.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\RealFFMpegCodecDecoder.h"
+				RelativePath="..\..\include\RealFFMpegCodecDecoder.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\RealFFMpegCodecEncoder.h"
+				RelativePath="..\..\include\RealFFMpegCodecEncoder.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\SimpleBuffer.h"
 				>
 			</File>
 			<File
@@ -278,35 +285,7 @@
 			>
 		</Filter>
 		<File
-			RelativePath=".\ffmpeg_build\win32\lib\avcodec.lib"
-			>
-		</File>
-		<File
-			RelativePath=".\ffmpeg_build\win32\lib\avcore.lib"
-			>
-		</File>
-		<File
-			RelativePath=".\ffmpeg_build\win32\lib\avdevice.lib"
-			>
-		</File>
-		<File
-			RelativePath=".\ffmpeg_build\win32\lib\avfilter.lib"
-			>
-		</File>
-		<File
-			RelativePath=".\ffmpeg_build\win32\lib\avformat.lib"
-			>
-		</File>
-		<File
-			RelativePath=".\ffmpeg_build\win32\lib\avutil.lib"
-			>
-		</File>
-		<File
 			RelativePath=".\ReadMe.txt"
-			>
-		</File>
-		<File
-			RelativePath=".\ffmpeg_build\win32\lib\swscale.lib"
 			>
 		</File>
 	</Files>
