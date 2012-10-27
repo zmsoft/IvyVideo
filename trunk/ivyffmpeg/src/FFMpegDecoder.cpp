@@ -1,12 +1,12 @@
 #include "FFMpegDecoder.h"
 //#include <stdint.h>
 
-
 //#include <windows.h>
 
 #ifndef MAX_AUDIO_PACKET_SIZE
 #define MAX_AUDIO_PACKET_SIZE (128 * 1024)
 #endif
+
 uint64_t	my_video_pkt_pts = AV_NOPTS_VALUE;
 
 #ifndef errinfo
@@ -101,9 +101,9 @@ AVInfo* FFMpegDecoder::openFile(char* fileName)
 
     for(unsigned int i=0; i<pFormatCtx->nb_streams; i++)
 	{
-        if( pFormatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO) 
+        if( pFormatCtx->streams[i]->codec->codec_type == CODEC_TYPE_VIDEO) 
             videoStream = i;
-        else if( pFormatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_AUDIO) 
+        else if( pFormatCtx->streams[i]->codec->codec_type == CODEC_TYPE_AUDIO) 
             audioStream = i;
 	}
     if( videoStream == -1 && audioStream == -1 )

@@ -3,6 +3,7 @@
 
 #include <wchar.h>
 #include "SimpleBuffer.h"
+#include "FFMpegInternal.h"
 extern "C"
 {
 	#include <libavcodec/avcodec.h>

@@ -1,5 +1,5 @@
-
-#pragma once
+#ifndef _FFMPEGWRAPPERAPI_H_
+#define _FFMPEGWRAPPERAPI_H_
 
 #ifdef WIN32
 	#if defined (DLL_EXPORT)
@@ -19,3 +19,7 @@ typedef struct
 	int linesize[4];
 	char frameType;	//I=1,P=2,B=3, refer to avcodec.h for other types.
 }FFMpegFrame;
+
+
+#endif // _FFMPEGWRAPPERAPI_H_
+

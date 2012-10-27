@@ -2,11 +2,12 @@
 #define FFMPEG_DECODER_H
 
 #include "FFMpegWrapperAPI.h"
+#include "FFMpegInternal.h"
 
 extern "C"
 {
-	#include <libavcodec/avcodec.h>
-	#include <libavformat/avformat.h>
+	#include "libavcodec/avcodec.h"
+	#include "libavformat/avformat.h"
 }
 
 #include "AVInfo.h"

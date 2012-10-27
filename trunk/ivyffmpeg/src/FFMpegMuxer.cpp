@@ -4,7 +4,7 @@ int FFMpegMuxer::init(const char* muxerName,const char* outputName)
 {
 	av_register_all();
 	formatCtx = avformat_alloc_context();
-	fmt = av_guess_format(muxerName,NULL,NULL);
+	fmt = guess_format(muxerName,NULL,NULL);
 	formatCtx->oformat = fmt;
 	strcpy(formatCtx->filename,outputName);
 
@@ -20,8 +20,8 @@ int FFMpegMuxer::addVideoStream(int streamIndex,int width,int height,int bitrate
 	videoStream = av_new_stream(formatCtx,streamIndex);
 	avcodec_get_context_defaults2(videoStream->codec, CODEC_TYPE_VIDEO);
 	videoStream->stream_copy = 1;
-	videoStream->avg_frame_rate.den = timebaseNum;
-	videoStream->avg_frame_rate.num = timebaseDen;
+	//videoStream->avg_frame_rate.den = timebaseNum;
+	//videoStream->avg_frame_rate.num = timebaseDen;
 	videoStream->time_base.den = timebaseDen;
 	videoStream->time_base.num = timebaseNum;
 	//videoStream->first_dts = 0;
@@ -30,7 +30,7 @@ int FFMpegMuxer::addVideoStream(int streamIndex,int width,int height,int bitrate
 	videoStream->r_frame_rate.num = timebaseDen;
 	AVCodecContext *codecCtx = videoStream->codec;
 	codecCtx->codec_id = CODEC_ID_H264;
-	codecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
+	codecCtx->codec_type = CODEC_TYPE_VIDEO;
 
 	codecCtx->time_base.den = timebaseDen;
 	codecCtx->time_base.num = timebaseNum;

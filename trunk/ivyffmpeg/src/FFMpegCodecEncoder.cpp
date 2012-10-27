@@ -89,7 +89,7 @@ int RealFFMpegCodecEncoder::InitCodec(const char *codecStr,FFMpegCodecEncoderPar
 
 	//setup conversion context
 	picConv = new RealFFMpegBitmapConverter(
-			param->inputWidth,param->inputHeight,av_get_pix_fmt(param->inputPixelType),
+			param->inputWidth,param->inputHeight,avcodec_get_pix_fmt(param->inputPixelType),
 			c->width,c->height,c->pix_fmt);
 	
 	//setup input buffers

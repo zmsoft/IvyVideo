@@ -132,7 +132,7 @@ void RealFFMpegCanvas::clear()
 
 FFMpegCanvas::FFMpegCanvas(int w, int h, char* fmtName)
 {
-	PixelFormat fmt = av_get_pix_fmt(fmtName);
+	PixelFormat fmt = avcodec_get_pix_fmt(fmtName);
 	_delegate = new RealFFMpegCanvas(w,h,fmt);
 }
 
@@ -143,7 +143,7 @@ FFMpegCanvas::~FFMpegCanvas()
 
 int FFMpegCanvas::draw(char *fmtStr, FFMpegFrame *pFrame, int x, int y, int imageW, int imageH)
 {
-	PixelFormat fmt = av_get_pix_fmt(fmtStr);
+	PixelFormat fmt = avcodec_get_pix_fmt(fmtStr);
 	return ((RealFFMpegCanvas*) _delegate)->draw(fmt,(AVPicture*)pFrame,x,y,imageW,imageH);
 }
 

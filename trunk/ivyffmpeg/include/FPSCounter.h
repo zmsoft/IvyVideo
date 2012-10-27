@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _FPSCOUNTER_H_
+#define _FPSCOUNTER_H_
 
 extern "C"
 {
@@ -70,3 +71,5 @@ protected:
 	char* name;
 	float fps;
 };
+
+#endif // _FPSCOUNTER_H_

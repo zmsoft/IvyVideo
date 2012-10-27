@@ -17,8 +17,8 @@ int FFMpegDemuxer::init(const char* demuxerName)
 	AVFormatContext *pFormatCtx = avformat_alloc_context();
 	pFormatCtx->iformat = inputFmt;
 
-	ByteIOContext *pb = (ByteIOContext*)malloc(sizeof(ByteIOContext);
-	init_put_byte(pb,pb_buf,pb_bufSize,0,opaque,pb_readFunc,pb_writeFunc,pb_seekFunc);
+	ByteIOContext *pb = (ByteIOContext*)malloc(sizeof(ByteIOContext));
+	//init_put_byte(pb,pb_buf,pb_bufSize,0,opaque,pb_readFunc,pb_writeFunc,pb_seekFunc);
 	int ret = av_open_input_stream(&pFormatCtx,pb,NULL,inputFmt,NULL);
 
 	return 0;

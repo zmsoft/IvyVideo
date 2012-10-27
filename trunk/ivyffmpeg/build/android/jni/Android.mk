@@ -1,6 +1,7 @@
 ROOT_PATH := $(call my-dir)/../../..
 EXT_PATH := $(ROOT_PATH)/..
 LOCAL_PATH := $(ROOT_PATH)/src
+TARGET_ARCH := arm
 
 include $(CLEAR_VARS)
 
@@ -29,12 +30,9 @@ LOCAL_MODULE:= libivyffmpeg
 EXT_LIB := $(ROOT_PATH)/ffmpeg
 LOCAL_C_INCLUDES := 			\
 	$(EXT_LIB) 		\
-	$(EXT_LIB)/libavcodec 	\
-	$(EXT_LIB)/libavformat  \
-	$(EXT_LIB)/libavutil	\
 	$(LOCAL_PATH)/../include
 
-LOCAL_CFLAGS := -DHAVE_CONFIG_H			
+LOCAL_CFLAGS := -DHAVE_CONFIG_H -DTARGET_CONFIG=\"config-$(TARGET_ARCH).h\"
 
 #include $(BUILD_PLUGIN_LIBRARY)
 include $(BUILD_STATIC_LIBRARY)
