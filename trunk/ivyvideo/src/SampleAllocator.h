@@ -1,0 +1,1 @@
+#ifndef _SAMPLEALLOCATOR_H_#define _SAMPLEALLOCATOR_H_class CSample{};class CSampleAllocator{};#endif
