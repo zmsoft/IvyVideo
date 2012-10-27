@@ -1,4 +1,4 @@
-include $(SUBDIR)../config.mak
+#include $(SUBDIR)../config.mak
 
 NAME = avcodec
 FFLIBS = avutil
@@ -692,7 +692,7 @@ DIRS = alpha arm bfin mlib ppc ps2 sh4 sparc x86
 
 CLEANFILES = sin_tables.c cos_tables.c *_tables.h *_tablegen$(HOSTEXESUF)
 
-include $(SUBDIR)../subdir.mak
+#include $(SUBDIR)../subdir.mak
 
 $(SUBDIR)dct-test$(EXESUF): $(SUBDIR)dctref.o
 

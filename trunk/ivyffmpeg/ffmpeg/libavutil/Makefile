@@ -1,4 +1,4 @@
-include $(SUBDIR)../config.mak
+#include $(SUBDIR)../config.mak
 
 NAME = avutil
 
@@ -46,6 +46,6 @@ TESTPROGS-$(HAVE_LZO1X_999_COMPRESS) += lzo
 
 DIRS = arm bfin sh4 x86
 
-include $(SUBDIR)../subdir.mak
+#include $(SUBDIR)../subdir.mak
 
 $(SUBDIR)lzo-test$(EXESUF): ELIBS = -llzo2
