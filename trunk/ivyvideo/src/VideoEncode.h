@@ -12,7 +12,7 @@ public:
 	bool init();
 	void uninit();
 
-	void onRawFrame();
+	void onRawFrame(char *data, int size, int width, int height, int format);
 
 private:
 	IVideoEncodeSink *mEncodeSink;

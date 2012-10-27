@@ -12,7 +12,7 @@ public:
 	bool init();
 	void uninit();
 
-	void onRtpPacket();
+	void onPacketData(char *data, int size);
 
 private:
 	IVideoDecodeSink *mDecodeSink;
