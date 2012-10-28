@@ -3,6 +3,9 @@
 
 #include "IvyVideo.h"
 
+#include "FFMpegEncoder.h"
+
+
 class CVideoEncode : public IDummyObject
 {
 public:
@@ -16,6 +19,10 @@ public:
 
 private:
 	IVideoEncodeSink *mEncodeSink;
+	
+	// for ffmpeg
+	FFMpegEncoder *mEncoder;
+	FFMpegEncodeProfile *mProfile;
 };
 
 

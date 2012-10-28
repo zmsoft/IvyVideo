@@ -11,6 +11,8 @@ CVideoEncode::~CVideoEncode()
 bool CVideoEncode::init()
 {
 	// init ffmpeg encode
+	mProfile = FFMpegEncoder::createDefaultProfile();
+	
 	return true;
 }
 

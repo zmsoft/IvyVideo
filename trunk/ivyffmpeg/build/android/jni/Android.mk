@@ -15,7 +15,6 @@ LOCAL_SRC_FILES:= \
         FFMpegCodecDecoder.cpp  \
         FFMpegDemuxer.cpp  \
         FFMpegMuxer.cpp    \
-        myFFMpeg.cpp       \
 	FFMpegBitmapConverter.cpp \
         FFMpegCodecEncoder.cpp  \
         FFMpegEncoder.cpp  \
@@ -30,7 +29,7 @@ LOCAL_MODULE:= libivyffmpeg
 EXT_LIB := $(ROOT_PATH)/ffmpeg
 LOCAL_C_INCLUDES := 			\
 	$(EXT_LIB) 		\
-	$(LOCAL_PATH)/../include
+	$(LOCAL_PATH)
 
 LOCAL_CFLAGS := -DHAVE_CONFIG_H -DTARGET_CONFIG=\"config-$(TARGET_ARCH).h\"
 
