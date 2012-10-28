@@ -15,18 +15,18 @@ typedef struct
 	char		formatStr[32];
 
 	char		audioCodec[32];
-	int			audioChannels;
-	int			audioBitrate;
-	int			audioSampleRate;
-	int			audioBitsPerSample;
+	int		audioChannels;
+	int		audioBitrate;
+	int		audioSampleRate;
+	int		audioBitsPerSample;
 
 	char		videoCodec[32];
-	int			videoWidth;
-	int			videoHeight;
+	int		videoWidth;
+	int		videoHeight;
 	double		videoFrameRate;
-	int			videoBitrate;
+	int		videoBitrate;
 	
-	wchar_t		outputFilename[256];
+	char		outputFilename[256];
 }FFMpegEncodeProfile;
 
 class FFMpegEncoder

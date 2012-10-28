@@ -89,11 +89,11 @@ static void dumpAVCodecContext(AVCodecContext *p)
 FFMpegEncodeProfile* FFMpegEncoder::createDefaultProfile()
 {
 	FFMpegEncodeProfile *myProfile = (FFMpegEncodeProfile*)malloc(sizeof(FFMpegEncodeProfile));
-	wcscpy(myProfile->outputFilename,L"test.avi");
-	sprintf(myProfile->formatStr,"%s","avi");
-	sprintf(myProfile->audioCodec,"%s","mp2");
+	//wcscpy(myProfile->outputFilename,L"test.avi");
+	//sprintf(myProfile->formatStr,"%s","avi");
+	//sprintf(myProfile->audioCodec,"%s","mp2");
 	//sprintf(myProfile->videoCodec,"%s","mpeg1video");
-	sprintf(myProfile->videoCodec,"%s","msmpeg4");
+	//sprintf(myProfile->videoCodec,"%s","msmpeg4");
 
 	myProfile->audioBitrate = 192000;
 	myProfile->audioChannels = 2;
