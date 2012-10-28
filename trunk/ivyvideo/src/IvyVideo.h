@@ -19,6 +19,7 @@ enum PacketType {
 	PT_UNKNOWN,
 	PT_RTP,		// default v2
 	PT_RTCP,	// default v2
+	PT_RAW,
 };
 
 enum ColorSpace {
@@ -30,9 +31,9 @@ enum ColorSpace {
 };
 
 enum SizeProfile {
-	EF_LOW_SIZE,		// 90P: 160x90
-	EF_NORMAL_SIZE,		// 180P: 320x180
-	EF_HIGH_SIZE,		// 360P: 640x360
+	SP_LOW_SIZE,		// 90P: 160x90
+	SP_NORMAL_SIZE,		// 180P: 320x180
+	SP_HIGH_SIZE,		// 360P: 640x360
 };
 
 enum FpsProfile {
@@ -61,6 +62,17 @@ enum BandWidthProfile {
 #define MAX_RTP_SIZE	1280
 #endif
 
+#ifndef MAX_SAMPLE_SIZE
+#define MAX_SAMPLE_SIZE		(1280*720*3/2)
+#endif
+
+#ifndef return_if_fail
+#define return_if_fail(p)	do { if(!(p)) {return;} } while(0)
+#endif
+
+#ifndef return_val_if_fail
+#define return_val_if_fail(p, v)	do { if(!(p)) {return (v);} } while(0)
+#endif
 
 #endif // _IVYVIDEO_H_
 

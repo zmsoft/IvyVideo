@@ -1,4 +1,5 @@
 #include "FFmpegEncoder.h"
+
 #include <string>
 using namespace std;
 
@@ -34,7 +35,7 @@ FFmpegEncoder::~FFmpegEncoder()
 
 //////////////////////////////////////////////////////////////////////////
 //
-//  Public properties
+//  Methods For Video
 //
 //////////////////////////////////////////////////////////////////////////
 
@@ -65,6 +66,160 @@ int FFmpegEncoder::getVideoFrameSize() const
     }
     return avpicture_get_size(this->videoParam.pixelFormat, this->videoParam.width, this->videoParam.height);
 }
+
+int FFmpegEncoder::encodeVideoFrame(const uint8_t *frameData)
+{
+    if (!this->opened)
+    {
+        return -1;
+    }
+
+    if (!this->encodeVideo)
+    {
+        return -2;
+    }
+
+    if (this->hasOutput)
+    {
+        return -3;
+    }
+
+    // encode the image frame
+    AVPicture picture;
+    avpicture_fill(&picture, (uint8_t *)frameData, this->videoParam.pixelFormat, this->videoParam.width, this->videoParam.height);
+    return this->encodeVideoData(&picture);
+}
+
+int FFmpegEncoder::writeVideoFrame(const uint8_t *frameData)
+{
+    if (!this->opened)
+    {
+        return -1;
+    }
+
+    if (!this->encodeVideo)
+    {
+        return -1;
+    }
+
+    if (!this->hasOutput)
+    {
+        return -1;
+    }
+
+    // encode the image
+    AVPicture picture;
+    avpicture_fill(&picture, (uint8_t *)frameData, this->videoParam.pixelFormat, this->videoParam.width, this->videoParam.height);
+    int encodedSize = this->encodeVideoData(&picture);
+
+    // output the encoded image data
+    if (encodedSize > 0)
+    {
+        this->writeVideoData(this->videoBuffer, encodedSize);
+    }
+	
+    return encodedSize;
+}
+
+// private method 
+int FFmpegEncoder::encodeVideoData(AVPicture *picture)
+{
+    AVCodecContext *videoCodecContext = this->videoStream->codec;
+
+    AVFrame *frame = avcodec_alloc_frame();
+    if (!frame)
+    {
+        return -1;
+    }
+
+    // convert the pixel format if needed
+    if (this->videoParam.pixelFormat != videoCodecContext->pix_fmt)
+    {
+        if (this->convertPixFmt(picture, this->videoFrame, &this->videoParam, videoCodecContext) != 0)
+        {
+            return -1;
+        }
+        // fill the frame
+        *(AVPicture *)frame = *this->videoFrame;
+    }
+    else
+    {
+        // fill the frame
+        *(AVPicture *)frame = *picture;
+    }
+
+    frame->pts = AV_NOPTS_VALUE;
+
+    // encode the frame
+    int encodedSize = avcodec_encode_video(videoCodecContext, this->videoBuffer, this->videoBufferSize, frame);
+
+    av_free(frame);
+
+    if (encodedSize < 0)
+    {
+        return -1;
+    }
+    else
+    {
+        return encodedSize;
+    }
+}
+
+// private method
+int FFmpegEncoder::writeVideoData(uint8_t *packetData, int packetSize)
+{
+    AVPacket packet;
+    av_init_packet(&packet);
+
+    packet.pts= av_rescale_q(this->videoStream->codec->coded_frame->pts, this->videoStream->codec->time_base, this->videoStream->time_base);
+    if (this->videoStream->codec->coded_frame->key_frame)
+    {
+        packet.flags |= PKT_FLAG_KEY;
+    }
+    packet.stream_index = this->videoStream->index;
+    packet.data = packetData;
+    packet.size = packetSize;
+
+    // write the compressed frame in the media file
+    int success = av_write_frame(this->outputContext, &packet);
+
+    av_free_packet(&packet);
+
+    if (success < 0)
+    {
+        return -1;
+    }
+
+    return 0;
+}
+
+// private method
+int FFmpegEncoder::convertPixFmt(AVPicture *srcPic, AVPicture *dstPic, const FFmpegVideoParam *srcParam, const AVCodecContext *dstContext)
+{
+    static SwsContext *img_convert_ctx = NULL;
+
+    if (img_convert_ctx == NULL)
+    {
+        img_convert_ctx = sws_getContext(
+            srcParam->width, srcParam->height, srcParam->pixelFormat,
+            dstContext->width, dstContext->height, dstContext->pix_fmt,
+            SWS_BICUBIC, NULL, NULL, NULL);
+    }
+
+    if (img_convert_ctx == NULL)
+    {
+        return -1;
+    }
+
+    return sws_scale(img_convert_ctx, srcPic->data, srcPic->linesize, 0, srcParam->height, dstPic->data, dstPic->linesize);
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+//
+//  Methods For Audio
+//
+//////////////////////////////////////////////////////////////////////////
 
 const uint8_t *FFmpegEncoder::getAudioEncodedBuffer() const
 {
@@ -117,66 +272,6 @@ int FFmpegEncoder::getAudioFrameSize() const
         frameSize = this->audioBufferSize;  // including all channels, return bytes directly
     }
     return frameSize;
-}
-
-
-//////////////////////////////////////////////////////////////////////////
-//
-//  Public Methods
-//
-//////////////////////////////////////////////////////////////////////////
-
-int FFmpegEncoder::encodeVideoFrame(const uint8_t *frameData)
-{
-    if (!this->opened)
-    {
-        return -1;
-    }
-
-    if (!this->encodeVideo)
-    {
-        return -2;
-    }
-
-    if (this->hasOutput)
-    {
-        return -3;
-    }
-
-    // encode the image frame
-    AVPicture picture;
-    avpicture_fill(&picture, (uint8_t *)frameData, this->videoParam.pixelFormat, this->videoParam.width, this->videoParam.height);
-    return this->encodeVideoData(&picture);
-}
-
-int FFmpegEncoder::writeVideoFrame(const uint8_t *frameData)
-{
-    if (!this->opened)
-    {
-        return -1;
-    }
-
-    if (!this->encodeVideo)
-    {
-        return -1;
-    }
-
-    if (!this->hasOutput)
-    {
-        return -1;
-    }
-
-    // encode the image
-    AVPicture picture;
-    avpicture_fill(&picture, (uint8_t *)frameData, this->videoParam.pixelFormat, this->videoParam.width, this->videoParam.height);
-    int encodedSize = this->encodeVideoData(&picture);
-
-    // output the encoded image data
-    if (encodedSize > 0)
-    {
-        this->writeVideoData(this->videoBuffer, encodedSize);
-    }
-    return encodedSize;
 }
 
 int FFmpegEncoder::encodeAudioFrame(const uint8_t *frameData, int dataSize)
@@ -237,6 +332,96 @@ int FFmpegEncoder::writeAudioFrame(const uint8_t *frameData, int dataSize)
     return encodedSize;
 }
 
+// private method
+int FFmpegEncoder::encodeAudioData(short *frameData, int dataSize)
+{
+    // the output size of the buffer which stores the encoded data
+    int audioSize = this->audioBufferSize;
+
+    if (this->audioStream->codec->frame_size <=1 && dataSize > 0)
+    {
+        // For PCM related codecs, the output size of the encoded data is
+        // calculated from the size of the input audio frame.
+        audioSize = dataSize;
+
+        // The following codes are used for calculating "short" size from original "sample" size.
+        // The codes are not needed any more because now the input size is already in "short" unit.
+
+        // calculated the PCM size from input data size
+        //switch(this->audioStream->codec->codec_id)
+        //{
+        //    case CODEC_ID_PCM_S32LE:
+        //    case CODEC_ID_PCM_S32BE:
+        //    case CODEC_ID_PCM_U32LE:
+        //    case CODEC_ID_PCM_U32BE:
+        //        audioSize <<= 1;
+        //        break;
+        //    case CODEC_ID_PCM_S24LE:
+        //    case CODEC_ID_PCM_S24BE:
+        //    case CODEC_ID_PCM_U24LE:
+        //    case CODEC_ID_PCM_U24BE:
+        //    case CODEC_ID_PCM_S24DAUD:
+        //        audioSize = audioSize / 2 * 3;
+        //        break;
+        //    case CODEC_ID_PCM_S16LE:
+        //    case CODEC_ID_PCM_S16BE:
+        //    case CODEC_ID_PCM_U16LE:
+        //    case CODEC_ID_PCM_U16BE:
+        //        break;
+        //    default:
+        //        audioSize >>= 1;
+        //        break;
+        //}
+    }
+
+    // encode the frame
+    int encodedSize = avcodec_encode_audio(this->audioStream->codec, this->audioBuffer, audioSize, frameData);
+	
+    if (encodedSize < 0)
+    {
+        return -1;
+    }
+    else
+    {
+        return encodedSize;
+    }
+}
+
+// private method
+int FFmpegEncoder::writeAudioData(uint8_t *packetData, int packetSize)
+{
+    AVPacket packet;
+    av_init_packet(&packet);
+
+    if (this->audioStream->codec && this->audioStream->codec->coded_frame->pts != AV_NOPTS_VALUE)
+    {
+        packet.pts= av_rescale_q(this->audioStream->codec->coded_frame->pts, this->audioStream->codec->time_base, this->audioStream->time_base);
+    }
+    packet.flags |= PKT_FLAG_KEY;
+    packet.stream_index = this->audioStream->index;
+    packet.data = packetData;
+    packet.size = packetSize;
+
+    // write the compressed frame in the media file
+    int success = av_write_frame(this->outputContext, &packet);
+
+    av_free_packet(&packet);
+
+    if (success < 0)
+    {
+        return -1;
+    }
+
+    return 0;
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+//
+//  Other Methods
+//
+//////////////////////////////////////////////////////////////////////////
+
 int FFmpegEncoder::open(const char *fileName)
 {
     if (this->opened)
@@ -268,6 +453,7 @@ int FFmpegEncoder::open(const char *fileName)
     {
         return -2;
     }
+	
     if (this->hasOutput)
     {
         this->outputContext->oformat = outputFormat;
@@ -493,182 +679,4 @@ void FFmpegEncoder::close()
 
     this->opened = false;
     this->hasOutput = false;
-}
-
-
-//////////////////////////////////////////////////////////////////////////
-//
-//  Private Methods
-//
-//////////////////////////////////////////////////////////////////////////
-
-int FFmpegEncoder::encodeVideoData(AVPicture *picture)
-{
-    AVCodecContext *videoCodecContext = this->videoStream->codec;
-
-    AVFrame *frame = avcodec_alloc_frame();
-    if (!frame)
-    {
-        return -1;
-    };
-
-    // convert the pixel format if needed
-    if (this->videoParam.pixelFormat != videoCodecContext->pix_fmt)
-    {
-        if (this->convertPixFmt(picture, this->videoFrame, &this->videoParam, videoCodecContext) != 0)
-        {
-            return -1;
-        }
-        // fill the frame
-        *(AVPicture *)frame = *this->videoFrame;
-    }
-    else
-    {
-        // fill the frame
-        *(AVPicture *)frame = *picture;
-    }
-
-    frame->pts = AV_NOPTS_VALUE;
-
-    // encode the frame
-    int encodedSize = avcodec_encode_video(videoCodecContext, this->videoBuffer, this->videoBufferSize, frame);
-
-    av_free(frame);
-
-    if (encodedSize < 0)
-    {
-        return -1;
-    }
-    else
-    {
-        return encodedSize;
-    }
-}
-
-int FFmpegEncoder::writeVideoData(uint8_t *packetData, int packetSize)
-{
-    AVPacket packet;
-    av_init_packet(&packet);
-
-    packet.pts= av_rescale_q(this->videoStream->codec->coded_frame->pts, this->videoStream->codec->time_base, this->videoStream->time_base);
-    if (this->videoStream->codec->coded_frame->key_frame)
-    {
-        packet.flags |= PKT_FLAG_KEY;
-    }
-    packet.stream_index = this->videoStream->index;
-    packet.data = packetData;
-    packet.size = packetSize;
-
-    // write the compressed frame in the media file
-    int success = av_write_frame(this->outputContext, &packet);
-
-    av_free_packet(&packet);
-
-    if (success < 0)
-    {
-        return -1;
-    }
-
-    return 0;
-}
-
-int FFmpegEncoder::convertPixFmt(AVPicture *srcPic, AVPicture *dstPic, const FFmpegVideoParam *srcParam, const AVCodecContext *dstContext)
-{
-    static SwsContext *img_convert_ctx = NULL;
-
-    if (img_convert_ctx == NULL)
-    {
-        img_convert_ctx = sws_getContext(
-            srcParam->width, srcParam->height, srcParam->pixelFormat,
-            dstContext->width, dstContext->height, dstContext->pix_fmt,
-            SWS_BICUBIC, NULL, NULL, NULL);
-    }
-
-    if (img_convert_ctx == NULL)
-    {
-        return -1;
-    }
-
-    return sws_scale(img_convert_ctx, srcPic->data, srcPic->linesize, 0, srcParam->height, dstPic->data, dstPic->linesize);
-}
-
-int FFmpegEncoder::encodeAudioData(short *frameData, int dataSize)
-{
-    // the output size of the buffer which stores the encoded data
-    int audioSize = this->audioBufferSize;
-
-    if (this->audioStream->codec->frame_size <=1 && dataSize > 0)
-    {
-        // For PCM related codecs, the output size of the encoded data is
-        // calculated from the size of the input audio frame.
-        audioSize = dataSize;
-
-        // The following codes are used for calculating "short" size from original "sample" size.
-        // The codes are not needed any more because now the input size is already in "short" unit.
-
-        // calculated the PCM size from input data size
-        //switch(this->audioStream->codec->codec_id)
-        //{
-        //    case CODEC_ID_PCM_S32LE:
-        //    case CODEC_ID_PCM_S32BE:
-        //    case CODEC_ID_PCM_U32LE:
-        //    case CODEC_ID_PCM_U32BE:
-        //        audioSize <<= 1;
-        //        break;
-        //    case CODEC_ID_PCM_S24LE:
-        //    case CODEC_ID_PCM_S24BE:
-        //    case CODEC_ID_PCM_U24LE:
-        //    case CODEC_ID_PCM_U24BE:
-        //    case CODEC_ID_PCM_S24DAUD:
-        //        audioSize = audioSize / 2 * 3;
-        //        break;
-        //    case CODEC_ID_PCM_S16LE:
-        //    case CODEC_ID_PCM_S16BE:
-        //    case CODEC_ID_PCM_U16LE:
-        //    case CODEC_ID_PCM_U16BE:
-        //        break;
-        //    default:
-        //        audioSize >>= 1;
-        //        break;
-        //}
-    }
-
-    // encode the frame
-    int encodedSize = avcodec_encode_audio(this->audioStream->codec, this->audioBuffer, audioSize, frameData);
-
-    if (encodedSize < 0)
-    {
-        return -1;
-    }
-    else
-    {
-        return encodedSize;
-    }
-}
-
-int FFmpegEncoder::writeAudioData(uint8_t *packetData, int packetSize)
-{
-    AVPacket packet;
-    av_init_packet(&packet);
-
-    if (this->audioStream->codec && this->audioStream->codec->coded_frame->pts != AV_NOPTS_VALUE)
-    {
-        packet.pts= av_rescale_q(this->audioStream->codec->coded_frame->pts, this->audioStream->codec->time_base, this->audioStream->time_base);
-    }
-    packet.flags |= PKT_FLAG_KEY;
-    packet.stream_index = this->audioStream->index;
-    packet.data = packetData;
-    packet.size = packetSize;
-
-    // write the compressed frame in the media file
-    int success = av_write_frame(this->outputContext, &packet);
-
-    av_free_packet(&packet);
-
-    if (success < 0)
-    {
-        return -1;
-    }
-
-    return 0;
 }

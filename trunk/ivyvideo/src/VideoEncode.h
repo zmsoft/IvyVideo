@@ -2,11 +2,14 @@
 #define _VIDEOENCODE_H_
 
 #include "IvyVideo.h"
+#include "MutexLock.h"
+#include "Timer.h"
+#include "SampleAllocator.h"
 
-#include "FFMpegEncoder.h"
+#include "FFmpegEncoder.h"
 
 
-class CVideoEncode : public IDummyObject
+class CVideoEncode : public IDummyObject, public CTimer
 {
 public:
 	CVideoEncode();
@@ -17,12 +20,17 @@ public:
 
 	void onRawFrame(char *data, int size, int width, int height, int format);
 
+protected:
+	virtual void onTimer();
+	
 private:
 	IVideoEncodeSink *mEncodeSink;
+	CSample *mSample;
+	CMutexLock mMutex;
 	
 	// for ffmpeg
-	FFMpegEncoder *mEncoder;
-	FFMpegEncodeProfile *mProfile;
+	FFmpegEncoder *mEncoder;
+	FFmpegVideoParam *mParam;
 };
 
 
