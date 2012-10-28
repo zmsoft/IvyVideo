@@ -6,19 +6,10 @@ TARGET_ARCH := arm
 include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES:= \
-	EncodeProfile.cpp  \
-        FFMpegCanvas.cpp   \
-        FFMpegDecoder.cpp  \
-        FFMpegFifo.cpp     \
-        FFMpegVideoDecoder.cpp  \
-	FFMpegAudioConverter.cpp  \
-        FFMpegCodecDecoder.cpp  \
-        FFMpegDemuxer.cpp  \
-        FFMpegMuxer.cpp    \
-	FFMpegBitmapConverter.cpp \
-        FFMpegCodecEncoder.cpp  \
-        FFMpegEncoder.cpp  \
-        FFMpegReSampler.cpp
+        FFmpegDecoder.cpp  \
+        FFmpegEncoder.cpp  \
+	FFmpegVideoParam.cpp \
+	FFmpegAudioParam.cpp 
 
 
 LOCAL_SHARED_LIBRARIES := libz

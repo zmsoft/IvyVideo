@@ -1,44 +1,26 @@
-///
-/// @file
-///
-/// @brief  Head file for encoder of FFmpeg
-///
-/// @version    0.2.1
-/// @date       2008/06/26
-///
-/// <b>History:</b>
-/// - Version:  0.1.0
-///   Author:   farthinker (farthinker@gmail.com)
-///   Date:     2008/05/14
-///   Changed:  Created
-/// - Version:  0.2.0
-///   Author:   farthinker (farthinker@gmail.com)
-///   Date:     2008/06/06
-///   Changed:  Bug fix, change the video input format to AVPicture, 
-///             add pixel format convertor
-/// - Version:  0.2.1
-///   Author:   John (john.zywu@gmail.com)
-///   Date:     2008/06/26
-///   Changed:  Fixed the memory leak bug, changed some of the interfaces
-///
-
-#ifndef FFmpegEncoder_H
-#define FFmpegEncoder_H
+#ifndef _FFMEPGENCODER_H_
+#define _FFMEPGENCODER_H_
 
 extern "C"
 {
-#include "avformat.h"
-#include "swscale.h"
+#define INT64_C
+#define __STDC_LIMIT_MACROS
+#include "libavformat/avformat.h"
+#include "libswscale/swscale.h"
 }
 
 #include "FFmpegVideoParam.h"
 #include "FFmpegAudioParam.h"
 
 
+#ifdef WIN32
 #ifdef DLL_FILE
 #   define FFMPEG_EXPORT _declspec(dllexport)
 #else
 #   define FFMPEG_EXPORT _declspec(dllimport)
+#endif
+#else
+#   define FFMPEG_EXPORT
 #endif
 
 ///
@@ -177,7 +159,7 @@ public:
     ///
     /// @param  [in/optional] fileName  The name of the file to which encoded results are written.
     ///
-	void open(const char *fileName = NULL);
+    int open(const char *fileName = NULL);
 
     ///
     /// @brief  Close the codec, output file and release the memories
@@ -272,7 +254,7 @@ private:
     ///
     /// @return A non-negative int represents the size of the encoded data
     ///
-	int encodeVideoData(AVPicture *picture);
+    int encodeVideoData(AVPicture *picture);
 
     ///
     /// @brief  Write the encoded video frame packet data to the output
@@ -280,7 +262,7 @@ private:
     /// @param  [in] packetData  The packet data of the encoded video frame
     /// @param  [in] packetSize  The size of the encoded video frame data
     ///
-	void writeVideoData(uint8_t *packetData, int packetSize);
+    int writeVideoData(uint8_t *packetData, int packetSize);
 
     ///
     /// @brief  Convert the pixel format of the input image
@@ -302,7 +284,7 @@ private:
     ///
     /// @return A non-negative int represents the size of the encoded data
     ///
-	int encodeAudioData(short *frameData, int dataSize);
+    int encodeAudioData(short *frameData, int dataSize);
 
     ///
     /// @brief  Write the encoded audio frame packet data to the output
@@ -310,7 +292,8 @@ private:
     /// @param  [in] packetData  The packet data of the encoded audio frame
     /// @param  [in] packetSize  The size of the encoded audio frame data
     ///
-	void writeAudioData(uint8_t *packetData, int packetSize);
+    int writeAudioData(uint8_t *packetData, int packetSize);
 };
 
-#endif//FFmpegEncoder_H
+#endif
+

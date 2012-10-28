@@ -1,30 +1,3 @@
-///
-/// @file
-///
-/// @brief  Head file for decoder of FFmpeg
-///
-/// @version    0.2.1
-/// @date       2008/06/26
-///
-/// <b>History:</b>
-/// - Version:  0.1.0
-///   Author:   farthinker (farthinker@gmail.com)
-///   Date:     2008/05/14
-///   Changed:  Created
-/// - Version:  0.2.0
-///   Author:   farthinker (farthinker@gmail.com)
-///   Date:     2008/06/06
-///   Changed:  Bug fix, change the video output format to AVPicture
-/// - Version:  0.2.1
-///   Author:   John (john.zywu@gmail.com)
-///   Date:     2008/06/26
-///   Changed:  Changed some of the interfaces
-///
-
-#ifndef DLL_FILE
-#define DLL_FILE
-#endif
-
 #include "FFmpegDecoder.h"
 
 FFmpegDecoder::FFmpegDecoder()
@@ -110,24 +83,24 @@ double FFmpegDecoder::getDecodeTimeStamp() const
 //
 //////////////////////////////////////////////////////////////////////////
 
-void FFmpegDecoder::open(const char *fileName)
+int FFmpegDecoder::open(const char *fileName)
 {
     if (this->opened)
     {
-        throw runtime_error("The decoder is already opened. Call close before opening a new file for decoding.");
+        return -1;
     }
 
     // open a media file as input.
     // The codecs are not opened. Only the file header (if present) is read
     if (av_open_input_file(&this->inputContext, fileName, NULL, 0, NULL))
     {
-        throw runtime_error(string("Could not open the media file as input: ") + fileName);
+        return -2;
     }
 
     // Read packets of a media file to get stream information.
     if (av_find_stream_info(this->inputContext) < 0)
     {
-        throw runtime_error("Could not get stream information from the media file.");
+        return -3;
     }
 
     // find the video/audio stream
@@ -159,7 +132,7 @@ void FFmpegDecoder::open(const char *fileName)
         AVCodec *videoCodec = avcodec_find_decoder(videoCodecContext->codec_id);
         if (!videoCodec)
         {
-            throw runtime_error("Video codec not found.");
+            return -4;
         }
 
         // get the video parameters
@@ -172,7 +145,7 @@ void FFmpegDecoder::open(const char *fileName)
         // open the video codec
         if (avcodec_open(videoCodecContext, videoCodec))
         {
-            throw runtime_error("Could not open the video codec.");
+            return -5;
         }
 
         // allocate the video frame to be encoded
@@ -181,7 +154,7 @@ void FFmpegDecoder::open(const char *fileName)
         this->videoFrameBuffer = (uint8_t *)av_malloc(this->videoBufferSize);
         if (!this->videoFrameBuffer)
         {
-            throw bad_alloc("Could not allocate video frame.");
+            return -6;
         }
     }
 
@@ -193,7 +166,7 @@ void FFmpegDecoder::open(const char *fileName)
         AVCodec *audioCodec = avcodec_find_decoder(audioCodecContext->codec_id);
         if (!audioCodec)
         {
-            throw runtime_error("Audio codec not found.");
+            return -7;
         }
 
         // get the audio parameters
@@ -204,7 +177,7 @@ void FFmpegDecoder::open(const char *fileName)
         // open the audio codec
         if (avcodec_open(audioCodecContext, audioCodec))
         {
-            throw runtime_error("Could not open the audio codec.");
+            return -8;
         }
 
         // allocate output buffer
@@ -216,8 +189,8 @@ void FFmpegDecoder::open(const char *fileName)
     }
 
     this->opened = true;
+    return 0;
 }
-
 
 void FFmpegDecoder::close()
 {
@@ -266,7 +239,7 @@ int FFmpegDecoder::decodeFrame()
 {
     if (!this->opened)
     {
-        throw runtime_error("Please call open() before decoding and reading frame.");
+        return -1;
     }
 
     // one audio packet may contains several audio frame, so we need to
@@ -302,6 +275,8 @@ int FFmpegDecoder::decodeFrame()
         // error
         return -1;
     }
+
+    return 0;
 }
 
 
@@ -337,7 +312,7 @@ int FFmpegDecoder::readFrame()
     return 0;
 }
 
-void FFmpegDecoder::decodeVideoFrame()
+int FFmpegDecoder::decodeVideoFrame()
 {
     int decodedSize, gotPicture = 0;
     AVFrame videoFrame;
@@ -362,11 +337,13 @@ void FFmpegDecoder::decodeVideoFrame()
 
     if (decodedSize < 0)
     {
-        throw runtime_error("Fail to decode a video frame.");
+        return -1;
     }
+
+    return 0;
 }
 
-void FFmpegDecoder::decodeAudioFrame()
+int FFmpegDecoder::decodeAudioFrame()
 {
     int decodedSize, outputFrameSize = this->audioBufferSize;
 
@@ -384,11 +361,13 @@ void FFmpegDecoder::decodeAudioFrame()
 
     if (decodedSize< 0)
     {
-        throw runtime_error("Fail to decode a audio frame.");
+        return -1;
     }
     else
     {
         this->audioPacketData += decodedSize;
         this->audioPacketSize -= decodedSize;
     }
+
+    return 0;
 }

@@ -1,46 +1,25 @@
-///
-/// @file
-///
-/// @brief  Head file for decoder of FFmpeg
-///
-/// @version    0.2.1
-/// @date       2008/06/26
-///
-/// <b>History:</b>
-/// - Version:  0.1.0
-///   Author:   farthinker (farthinker@gmail.com)
-///   Date:     2008/05/14
-///   Changed:  Created
-/// - Version:  0.2.0
-///   Author:   farthinker (farthinker@gmail.com)
-///   Date:     2008/06/06
-///   Changed:  Bug fix, change the video output format to AVPicture
-/// - Version:  0.2.1
-///   Author:   John (john.zywu@gmail.com)
-///   Date:     2008/06/26
-///   Changed:  Changed some of the interfaces
-///
-
-
-#ifndef FFmpegDecoder_H
-#define FFmpegDecoder_H
-
-#include <string>
+#ifndef _FFMPEGDECODER_H_
+#define _FFMPEGDECODER_H_
 
 extern "C"
 {
-#include "avformat.h"
+#include "libavformat/avformat.h"
 }
 
 #include "FFmpegVideoParam.h"
 #include "FFmpegAudioParam.h"
 
+#include <string>
 using namespace std;
 
+#ifdef WIN32
 #ifdef DLL_FILE
 #   define FFMPEG_EXPORT _declspec(dllexport)
 #else
 #   define FFMPEG_EXPORT _declspec(dllimport)
+#endif
+#else
+#   define FFMPEG_EXPORT
 #endif
 
 
@@ -157,7 +136,7 @@ public:
     ///
     /// @param  [in] fileName   The name of the input media file (including the extension).
     ///
-    void open(const char *fileName);
+    int open(const char *fileName);
 
     ///
     /// @brief  Close the input file, codecs, and release the memories.
@@ -228,12 +207,12 @@ private:
     ///
     /// @brief  Decode a video frame from the current packet, and store it in the video frame buffer
     ///
-    void decodeVideoFrame();
+    int decodeVideoFrame();
 
     ///
     /// @brief  Decode an audio frame from the current packet, and store it in the audio frame buffer
     ///
-    void decodeAudioFrame();
+    int decodeAudioFrame();
 };
 
-#endif//FFmpegDecoder_H
+#endif

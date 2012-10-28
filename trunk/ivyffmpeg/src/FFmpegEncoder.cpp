@@ -1,32 +1,3 @@
-///
-/// @file
-///
-/// @brief  Implementation file for encoder of FFmpeg
-///
-/// @version    0.2.1
-/// @date       2008/06/26
-///
-/// <b>History:</b>
-/// - Version:  0.1.0
-///   Author:   farthinker (farthinker@gmail.com)
-///   Date:     2008/05/14
-///   Changed:  Created
-/// - Version:  0.2.0
-///   Author:   farthinker (farthinker@gmail.com)
-///   Date:     2008/06/06
-///   Changed:  Bug fix, change the video input format to AVPicture, 
-///             add pixel format convertor
-/// - Version:  0.2.1
-///   Author:   John (john.zywu@gmail.com)
-///   Date:     2008/06/26
-///   Changed:  Fixed the memory leak bug, changed some of the interfaces
-///
-
-
-#ifndef DLL_FILE
-#define DLL_FILE
-#endif
-
 #include "FFmpegEncoder.h"
 #include <string>
 using namespace std;
@@ -159,17 +130,17 @@ int FFmpegEncoder::encodeVideoFrame(const uint8_t *frameData)
 {
     if (!this->opened)
     {
-        throw runtime_error("Please call open() before encoding.");
+        return -1;
     }
 
     if (!this->encodeVideo)
     {
-        throw runtime_error("Can not encode video frame because video codec is not initialized.");
+        return -2;
     }
 
     if (this->hasOutput)
     {
-        throw runtime_error("Please use writeVideoFrame() if there is output.");
+        return -3;
     }
 
     // encode the image frame
@@ -182,17 +153,17 @@ int FFmpegEncoder::writeVideoFrame(const uint8_t *frameData)
 {
     if (!this->opened)
     {
-        throw runtime_error("Please call open() before encoding.");
+        return -1;
     }
 
     if (!this->encodeVideo)
     {
-        throw runtime_error("Can not encode video frame because video codec is not initialized.");
+        return -1;
     }
 
     if (!this->hasOutput)
     {
-        throw runtime_error("Please use encodeVideoFrame() if there is no output.");
+        return -1;
     }
 
     // encode the image
@@ -212,22 +183,22 @@ int FFmpegEncoder::encodeAudioFrame(const uint8_t *frameData, int dataSize)
 {
     if (!this->opened)
     {
-        throw runtime_error("Please call open() before encoding.");
+        return -1;
     }
 
     if (!this->encodeAudio)
     {
-        throw runtime_error("Can not encode video frame because audio codec is not initialized.");
+        return -1;
     }
 
     if (this->hasOutput)
     {
-        throw runtime_error("Please use writeAudioFrame() if there is output.");
+        return -1;
     }
 
     if (this->audioStream->codec->frame_size <= 1 && dataSize < 1)
     {
-        throw runtime_error("Parameter dataSize must be set for some specific (e.g. PCM) codecs.");
+        return -1;
     }
 
     return this->encodeAudioData((short*)frameData, dataSize/sizeof(short));
@@ -237,22 +208,22 @@ int FFmpegEncoder::writeAudioFrame(const uint8_t *frameData, int dataSize)
 {
     if (!this->opened)
     {
-        throw runtime_error("Please call open() before encoding.");
+        return -1;
     }
 
     if (!this->encodeAudio)
     {
-        throw runtime_error("Can not encode video frame because audio codec is not initialized.");
+        return -1;
     }
 
     if (!this->hasOutput)
     {
-        throw runtime_error("Please use encodeVideoFrame() if there is no output.");
+        return -1;
     }
 
     if (this->audioStream->codec->frame_size <= 1 && dataSize < 1)
     {
-        throw runtime_error("Parameter dataSize must be set for some specific (e.g. PCM) codecs.");
+        return -1;
     }
 
     // encode the audio data
@@ -266,17 +237,17 @@ int FFmpegEncoder::writeAudioFrame(const uint8_t *frameData, int dataSize)
     return encodedSize;
 }
 
-void FFmpegEncoder::open(const char *fileName)
+int FFmpegEncoder::open(const char *fileName)
 {
     if (this->opened)
     {
-        throw runtime_error("The encoder is already opened. Call close before opening a new encoder.");
+        return -1;
     }
 
     this->hasOutput = (fileName != NULL) && (fileName[0] != 0);
     if (!this->hasOutput && this->videoParam.videoCodecName.empty() && this->audioParam.audioCodecName.empty())
     {
-        throw invalid_argument("The encoder must have output file or video/audio codec set.");
+        return -2;
     }
 
     // initialize the output format
@@ -287,7 +258,7 @@ void FFmpegEncoder::open(const char *fileName)
         outputFormat = guess_format(NULL, fileName, NULL);
         if(!outputFormat)
         {
-            throw runtime_error("Couldn't find corresponding format for the output file.");
+            return -1;
         }
     }
 
@@ -295,12 +266,12 @@ void FFmpegEncoder::open(const char *fileName)
     this->outputContext = av_alloc_format_context();
     if (!this->outputContext)
     {
-        throw bad_alloc("Couldn't allocate the output media context.");
+        return -2;
     }
     if (this->hasOutput)
     {
         this->outputContext->oformat = outputFormat;
-        _snprintf(this->outputContext->filename, sizeof(this->outputContext->filename), "%s", fileName);
+        snprintf(this->outputContext->filename, sizeof(this->outputContext->filename), "%s", fileName);
     }
 
     // video related initialization if necessary
@@ -309,7 +280,7 @@ void FFmpegEncoder::open(const char *fileName)
         // validate the video codec
         if ((!outputFormat || outputFormat->video_codec == CODEC_ID_NONE) && this->videoParam.videoCodecName.empty())
         {
-            throw runtime_error("The video codec wasn't specified.");
+            return -1;
         }
 
         // find the video encoder
@@ -326,14 +297,14 @@ void FFmpegEncoder::open(const char *fileName)
         }
         if (!videoCodec)
         {
-            throw runtime_error("Video codec not found.");
+            return -1;
         }
 
         // add the video stream with stream id 0
         this->videoStream = av_new_stream(this->outputContext, 0);
         if (!this->videoStream)
         {
-            throw bad_alloc("Couldn't allocate video stream.");
+            return -2;
         }
 
         // set the parameters for video codec context
@@ -377,7 +348,7 @@ void FFmpegEncoder::open(const char *fileName)
         // open the video codec
         if (avcodec_open(videoCodecContext, videoCodec) < 0)
         {
-            throw runtime_error("Could not open the video codec.");
+            return -1;
         }
 
         // allocate the output buffer
@@ -392,7 +363,7 @@ void FFmpegEncoder::open(const char *fileName)
             if (   this->videoFrame == NULL
                 || avpicture_alloc(this->videoFrame, videoCodecContext->pix_fmt, videoCodecContext->width, videoCodecContext->height) < 0 )
             {
-                throw bad_alloc("Couldn't allocate the video frame for pixel format conversion.");
+                return -2;
             }
         }
     }
@@ -403,7 +374,7 @@ void FFmpegEncoder::open(const char *fileName)
         // validate the audio codec
         if ((!outputFormat || outputFormat->audio_codec == CODEC_ID_NONE) && this->audioParam.audioCodecName.empty())
         {
-            throw runtime_error("The audio codec wasn't specified.");
+            return -1;
         }
 
         // find the audio encoder
@@ -420,14 +391,14 @@ void FFmpegEncoder::open(const char *fileName)
         }
         if (!audioCodec)
         {
-            throw runtime_error("Audio codec not found.");
+            return -1;
         }
 
         // add the audio stream with stream id 1
         this->audioStream = av_new_stream(this->outputContext, 1);
         if (!this->audioStream)
         {
-            throw bad_alloc("Couldn't allocate audio stream.");
+            return -2;
         }
 
         // set the parameters for audio codec context
@@ -441,7 +412,7 @@ void FFmpegEncoder::open(const char *fileName)
         // open the audio codec
         if (avcodec_open(audioCodecContext, audioCodec) < 0)
         {
-            throw runtime_error("Could not open the audio codec.");
+            return -1;
         }
 
         // TODO: how to determine the buffer size?
@@ -455,7 +426,7 @@ void FFmpegEncoder::open(const char *fileName)
     {
         if (av_set_parameters(this->outputContext, NULL) < 0)
         {
-            throw runtime_error("Invalid output format parameters.");
+            return -1;
         }
     }
 
@@ -466,13 +437,13 @@ void FFmpegEncoder::open(const char *fileName)
     {
         if (url_fopen(&this->outputContext->pb, fileName, URL_WRONLY) < 0)
         {
-            throw runtime_error(string("Could not open the file: ") + fileName);
+            return -1;
         }
 
         // write the stream header, if any
         if (av_write_header(this->outputContext))
         {
-            throw runtime_error("Could not write the video header.");
+            return -1;
         }
     }
 
@@ -490,7 +461,7 @@ void FFmpegEncoder::close()
     {
         // write the trailer, and close the output file
         av_write_trailer(this->outputContext);
-        url_fclose(&this->outputContext->pb);
+        url_fclose(this->outputContext->pb);
     }
 
     if (this->encodeVideo)
@@ -538,7 +509,7 @@ int FFmpegEncoder::encodeVideoData(AVPicture *picture)
     AVFrame *frame = avcodec_alloc_frame();
     if (!frame)
     {
-        throw runtime_error("Could not allocate frame.");
+        return -1;
     };
 
     // convert the pixel format if needed
@@ -546,7 +517,7 @@ int FFmpegEncoder::encodeVideoData(AVPicture *picture)
     {
         if (this->convertPixFmt(picture, this->videoFrame, &this->videoParam, videoCodecContext) != 0)
         {
-            throw runtime_error("Fail to convert the image pixel format.");
+            return -1;
         }
         // fill the frame
         *(AVPicture *)frame = *this->videoFrame;
@@ -566,7 +537,7 @@ int FFmpegEncoder::encodeVideoData(AVPicture *picture)
 
     if (encodedSize < 0)
     {
-        throw runtime_error("Error while encoding the video frame.");
+        return -1;
     }
     else
     {
@@ -574,7 +545,7 @@ int FFmpegEncoder::encodeVideoData(AVPicture *picture)
     }
 }
 
-void FFmpegEncoder::writeVideoData(uint8_t *packetData, int packetSize)
+int FFmpegEncoder::writeVideoData(uint8_t *packetData, int packetSize)
 {
     AVPacket packet;
     av_init_packet(&packet);
@@ -595,8 +566,10 @@ void FFmpegEncoder::writeVideoData(uint8_t *packetData, int packetSize)
 
     if (success < 0)
     {
-        throw runtime_error("Error while writing video frame.");
+        return -1;
     }
+
+    return 0;
 }
 
 int FFmpegEncoder::convertPixFmt(AVPicture *srcPic, AVPicture *dstPic, const FFmpegVideoParam *srcParam, const AVCodecContext *dstContext)
@@ -613,7 +586,7 @@ int FFmpegEncoder::convertPixFmt(AVPicture *srcPic, AVPicture *dstPic, const FFm
 
     if (img_convert_ctx == NULL)
     {
-        throw runtime_error("Cannot initialize the image conversion context.");
+        return -1;
     }
 
     return sws_scale(img_convert_ctx, srcPic->data, srcPic->linesize, 0, srcParam->height, dstPic->data, dstPic->linesize);
@@ -665,7 +638,7 @@ int FFmpegEncoder::encodeAudioData(short *frameData, int dataSize)
 
     if (encodedSize < 0)
     {
-        throw runtime_error("Error while encoding the audio frame.");
+        return -1;
     }
     else
     {
@@ -673,7 +646,7 @@ int FFmpegEncoder::encodeAudioData(short *frameData, int dataSize)
     }
 }
 
-void FFmpegEncoder::writeAudioData(uint8_t *packetData, int packetSize)
+int FFmpegEncoder::writeAudioData(uint8_t *packetData, int packetSize)
 {
     AVPacket packet;
     av_init_packet(&packet);
@@ -694,6 +667,8 @@ void FFmpegEncoder::writeAudioData(uint8_t *packetData, int packetSize)
 
     if (success < 0)
     {
-        throw runtime_error("Error while writing audio frame.");
+        return -1;
     }
+
+    return 0;
 }
