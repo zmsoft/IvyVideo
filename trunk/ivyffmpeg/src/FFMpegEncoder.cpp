@@ -1,5 +1,4 @@
 #include "FFMpegEncoder.h"
-//#include "fftrans/FFMpegFifo.h"
 
 #ifndef errinfo
 #define errinfo(str)		fprintf(stderr,"%s: %s\n",__FUNCTION__,str)
@@ -20,6 +19,7 @@ static AVFrame* allocDummyFrame(int w,int h)
 
 	return picture;
 }
+
 static void fillDummyFrame(AVFrame *picture,int w,int h,int i)
 {
 	/* prepare a dummy image */
@@ -39,8 +39,8 @@ static void fillDummyFrame(AVFrame *picture,int w,int h,int i)
             picture->data[2][y * picture->linesize[2] + x] = 64 + x + i * 5;
         }
     }
-
 }
+
 static AVCodecContext* createMP4Encoder()
 {
 	av_register_all();
@@ -51,8 +51,8 @@ static AVCodecContext* createMP4Encoder()
 	AVCodecContext *pVideoCodecCtx = avcodec_alloc_context();
 	//avcodec_get_context_defaults2(pVideoCodecCtx, CODEC_TYPE_VIDEO);
 	
-//	pVideoCodecCtx->codec_id = pVideoCodec->id;
- //   pVideoCodecCtx->codec_type = CODEC_TYPE_VIDEO;
+	// pVideoCodecCtx->codec_id = pVideoCodec->id;
+	// pVideoCodecCtx->codec_type = CODEC_TYPE_VIDEO;
     pVideoCodecCtx->bit_rate = 400000;
 	pVideoCodecCtx->width = 352;
 	pVideoCodecCtx->height = 288;
@@ -70,6 +70,7 @@ static AVCodecContext* createMP4Encoder()
 	else
 		return NULL;
 }
+
 static void dumpAVCodecContext(AVCodecContext *p)
 {
         FILE *file = fopen("avcodecCtx.dump","wb");
@@ -80,6 +81,10 @@ static void dumpAVCodecContext(AVCodecContext *p)
 		}
 		fclose(file);
 }
+
+/**
+ *  class FFMpegEncoder
+ */
 
 FFMpegEncodeProfile* FFMpegEncoder::createDefaultProfile()
 {
