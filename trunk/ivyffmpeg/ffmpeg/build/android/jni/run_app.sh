@@ -4,7 +4,7 @@ if [ $# != 1 ]; then
 fi
 
 mod=$1
-modlist="avcodec avformat avutil "
+modlist="avcodec avformat avutil swscale"
 
 if [ $mod = "all" ]; then
     echo "[*] building all ...."

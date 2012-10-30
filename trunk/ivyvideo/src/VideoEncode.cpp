@@ -1,4 +1,4 @@
-#include "Video Encode.h"
+#include "VideoEncode.h"
 
 CVideoEncode::CVideoEncode()
 {
@@ -41,11 +41,12 @@ void CVideoEncode::uninit()
 
 void CVideoEncode::onRawFrame(char *data, int size, int width, int height, int format)
 {
-	return_if_fail(width == mParam.width && height == mParam.height);
+	return_if_fail(mParam != NULL);
+	return_if_fail(width == mParam->width && height == mParam->height);
 	
 	mMutex.on();
 	if (mSample == NULL) {
-		mSample = CVideoSampleAllocator::inst()->allocSample();
+		mSample = CSampleAllocator::inst()->allocSample(0);
 		mSample->setFormat(width, height, format);
 	}
 	
@@ -59,7 +60,7 @@ void CVideoEncode::onTimer()
 {
 	return_if_fail(mEncoder != NULL);
 
-	CSample *pSamle = NULL;
+	CSample *pSample = NULL;
 	mMutex.on();
 	if (mSample) {
 		pSample = mSample;
@@ -69,11 +70,11 @@ void CVideoEncode::onTimer()
 	mMutex.off();
 	
 	if (pSample) {
-		int size = mEncoder->encodeVideoFrame(pSample->getData());
+		int size = mEncoder->encodeVideoFrame((const uint8_t *)pSample->getDataPtr());
 		if (size > 0) {
 			// maybe rtp pack
 			if (mEncodeSink) {
-				mEncodeSink->onPacked(mEncoder->getVideoEncodedBuffer(), size, PT_RAW);
+				mEncodeSink->onPacked((char *)mEncoder->getVideoEncodedBuffer(), size, PT_RAW);
 			}
 		}
 		

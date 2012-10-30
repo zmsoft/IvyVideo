@@ -12,7 +12,7 @@ public:
 	void startTimer(int msec);
 	void stopTimer();
 	
-	virtual onTimer();
+	virtual void onTimer();
 	
 	// for CRunnable
 	virtual void loopRun();

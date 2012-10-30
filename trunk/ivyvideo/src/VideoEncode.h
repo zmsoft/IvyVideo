@@ -24,9 +24,9 @@ protected:
 	virtual void onTimer();
 	
 private:
-	IVideoEncodeSink *mEncodeSink;
+	IvyVideoEncodeSink *mEncodeSink;
 	CSample *mSample;
-	CMutexLock mMutex;
+	CMutex mMutex;
 	
 	// for ffmpeg
 	FFmpegEncoder *mEncoder;

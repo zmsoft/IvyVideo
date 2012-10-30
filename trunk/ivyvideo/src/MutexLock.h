@@ -8,7 +8,12 @@ class CMutex
 public:
 	CMutex() 
 	{
-		pthread_mutex_init(&mMutex, NULL);
+		pthread_mutexattr_t mutex_attr;
+		pthread_mutexattr_init(&mutex_attr);
+		pthread_mutexattr_settype(&mutex_attr,PTHREAD_MUTEX_RECURSIVE);
+
+		pthread_mutex_init(&mMutex, &mutex_attr);
+		pthread_mutexattr_destroy(&mutex_attr);
 	}
 
 	~CMutex()

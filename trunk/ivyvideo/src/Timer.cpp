@@ -1,6 +1,8 @@
-#include "timer.h"
+#include "Timer.h"
+
+#include <unistd.h>
 	
-CTimer::CTimer();
+CTimer::CTimer()
 {
 	mPeriod = 0;
 }
@@ -32,3 +34,6 @@ void CTimer::loopRun()
 		usleep(mPeriod);
 	}while(isRunning());
 }
+
+void CTimer::onTimer()
+{}

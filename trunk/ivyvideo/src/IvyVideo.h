@@ -8,7 +8,7 @@ public:
 	virtual void onPacked(char *data, int size, int type) = 0;
 };
 
-class IvyVideoDeocdeSink
+class IvyVideoDecodeSink
 {
 public:
 	// now only output I420 data

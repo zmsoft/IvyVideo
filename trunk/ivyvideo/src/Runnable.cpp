@@ -1,4 +1,4 @@
-#include "timer.h"
+#include "Runnable.h"
 
 CRunnable::CRunnable()
 {
@@ -34,7 +34,7 @@ void CRunnable::run(void *param)
 	CRunnable *p = (CRunnable *)param;
 	if (p) {
 		p->loopRun();
+		p->mStatus = S_Quit;
 	}
-	mStatus = S_Quit;
 }
 

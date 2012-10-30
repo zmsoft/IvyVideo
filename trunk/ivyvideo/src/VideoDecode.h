@@ -2,6 +2,7 @@
 #define _VIDEODECODE_H_
 
 #include "IvyVideo.h"
+#include "IDummyObject.h"
 
 class CVideoDecode : public IDummyObject
 {
@@ -15,7 +16,7 @@ public:
 	void onPacketData(char *data, int size);
 
 private:
-	IVideoDecodeSink *mDecodeSink;
+	IvyVideoDecodeSink *mDecodeSink;
 };
 
 
