@@ -3,13 +3,32 @@
 #include <stdio.h>
 #include <jni.h>
 
+#include "VideoEncoder.h"
+
 #define JNI_VERSION 	JNI_VERSION_1_2
-#define JNIREG_CLASS 	"com/quine/ivysee/ivyvideo"
+#define JNIREG_CLASS 	"com/ivysee/mirage"
 
 JNIEXPORT jstring JNICALL native_hello(JNIEnv *env, jclass clazz)
 {
 	printf("hello in c native code.\n");
 	return (*env)->NewStringUTF(env, "hello world returned.");
+}
+
+JNIEXPORT jvoid JNICALL native_init(JNIEnv *env, jclass clazz)
+{
+}
+
+JNIEXPORT jvoid JNICALL native_uninit(JNIEnv *env, jclass clazz)
+{
+}
+
+JNIEXPORT jvoid JNICALL native_rawdata(JNIEnv *env, jclass clazz, jobject handle, 
+	jarray data, jint size, jint fmt, jint width, jint height, jint orientation, jint facing)
+{
+	CVideoEncode *pEnc = (CVideoEncode *)handle;
+	if (!pEnc || size <= 0) {
+		return;
+	}
 }
 
 /**
