@@ -1,12 +1,14 @@
 #ifndef _IVYVIDEO_H_
 #define _IVYVIDEO_H_
 
+#include "IvyCommon.h"
+
 class IvyVideoEncode
 {
 public:
 	virtual bool init() = 0;
 	virtual void uninit() = 0;
-	virtual void onRawFrame(char *data, int size, int width, int height, int format) = 0;
+	virtual void onRawFrame(char *data, int size, RawFrameFormat format) = 0;
 };
 
 class IvyVideoDecode

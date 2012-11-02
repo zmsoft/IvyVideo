@@ -30,7 +30,7 @@ LOCAL_SRC_FILES := ../src/jni_ivymirage.cpp \
 LOCAL_STATIC_LIBRARIES := 
 LOCAL_SHARED_LIBRARIES := 
 
-LOCAL_LDLIBS := -L$(EXT_PATH)/ivyffmpeg/build/libs/armeabi-v7a -livyffmpeg
+LOCAL_LDLIBS = -L$(EXT_PATH)/ivyffmpeg/build/libs/armeabi-v7a -livyffmpeg
 
 LOCAL_C_INCLUDES := 		\
 	$(LOCAL_PATH)		\

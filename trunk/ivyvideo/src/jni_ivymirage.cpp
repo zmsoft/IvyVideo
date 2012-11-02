@@ -3,7 +3,8 @@
 #include <stdio.h>
 #include <jni.h>
 
-#include "VideoEncode.h"
+#include "IvyCommon.h"
+#include "IvyVideo.h"
 
 #define JNI_VERSION 	JNI_VERSION_1_2
 #define JNIREG_CLASS 	"com/ivysee/mirage"
@@ -25,20 +26,18 @@ JNIEXPORT void JNICALL native_uninit(JNIEnv *env, jclass clazz)
 JNIEXPORT void JNICALL native_rawvideo(JNIEnv *env, jclass clazz, jint handle, 
 	jbyteArray array, jint len, jint fmt, jint width, jint height, jint orientation)
 {
-	jbyte *data = NULL;
-	RawFrameFormat frameFormat;
-	CVideoEncode *pEnc = (CVideoEncode *)handle;
-
+	IvyVideoEncode *pEnc = (IvyVideoEncode *)handle;
 	return_if_fail(pEnc != NULL && len > 0);
 
+	RawFrameFormat frameFormat;
 	frameFormat.fmt = fmt;
 	frameFormat.width = width;
 	frameFormat.height = height;
 	frameFormat.orientation = orientation;
 
-	data = env->GetByteArrayElements(array, NULL);
+	jbyte *data = env->GetByteArrayElements(array, NULL);
 	return_if_fail(data != NULL);
-	//pEnc->onRawFrame(data, len, width, height, frameFormat);
+	pEnc->onRawFrame((char *)data, len, frameFormat);
 	env->ReleaseByteArrayElements(array, data, JNI_ABORT);
 }
 

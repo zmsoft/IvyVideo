@@ -39,17 +39,17 @@ void CVideoEncode::uninit()
 	}
 }
 
-void CVideoEncode::onRawFrame(char *data, int size, int width, int height, int format)
+void CVideoEncode::onRawFrame(char *data, int size, RawFrameFormat format)
 {
 	return_if_fail(mParam != NULL);
-	return_if_fail(width == mParam->width && height == mParam->height);
+	return_if_fail(format.width == mParam->width && 
+		format.height == mParam->height);
 	
 	mMutex.on();
 	if (mSample == NULL) {
 		mSample = CSampleAllocator::inst()->allocSample(0);
-		mSample->setFormat(width, height, format);
+		mSample->setFormat(format.width, format.height, format.fmt);
 	}
-	
 	mSample->setData(data, size);
 	mMutex.off();
 }

@@ -21,7 +21,7 @@ public:
 
 	virtual bool init();
 	virtual void uninit();
-	virtual void onRawFrame(char *data, int size, int width, int height, int format);
+	virtual void onRawFrame(char *data, int size, RawFrameFormat format);
 
 protected:
 	virtual void onTimer();

@@ -3,10 +3,12 @@
 CRunnable::CRunnable()
 {
 	mStatus = S_None;
+	mPid = (pthread_t)-1;
 }
 
 CRunnable::~CRunnable()
 {
+	mStatus = S_None;
 }
 
 bool CRunnable::isRunning() 
@@ -17,7 +19,7 @@ bool CRunnable::isRunning()
 void CRunnable::startRun()
 {
 	mStatus = S_Running;
-	//pthread_create(run, this);
+	pthread_create(&mPid, NULL, run, this);
 }
 
 void CRunnable::stopRun()
@@ -25,16 +27,14 @@ void CRunnable::stopRun()
 	mStatus = S_Stop;
 }
 
-void CRunnable::loopRun()
-{
-}
-
-void CRunnable::run(void *param)
+void *CRunnable::run(void *param)
 {
 	CRunnable *p = (CRunnable *)param;
 	if (p) {
 		p->loopRun();
 		p->mStatus = S_Quit;
 	}
+
+	return NULL;
 }
 

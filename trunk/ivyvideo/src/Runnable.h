@@ -1,6 +1,8 @@
 #ifndef _RUNNABLE_H_
 #define _RUNNABLE_H_
 
+#include <pthread.h>
+
 class CRunnable
 {
 public:
@@ -9,11 +11,12 @@ public:
 	
 	virtual void startRun();
 	virtual void stopRun();
-	virtual void loopRun();
 	virtual bool isRunning();
 	
+	virtual void loopRun() = 0;
+
 protected:
-	static void run(void *param);
+	static void * run(void *param);
 	
 private:
 	enum {
@@ -23,6 +26,7 @@ private:
 		S_Quit,
 	};
 	int mStatus;
+	pthread_t mPid;
 };
 
 #endif
