@@ -1,11 +1,23 @@
+//#define CC_TYPE "gcc"
+//#define CC_VERSION __VERSION__
+#define restrict restrict
+#define ASMALIGN(ZEROBITS) ".align 1 << " #ZEROBITS "\n\t"
+#define EXTERN_PREFIX ""
+#define EXTERN_ASM 
+#define av_always_inline
 #define ARCH_ALPHA 0
 #define ARCH_ARM 1
+#define ARCH_AVR32 0
+#define ARCH_AVR32_AP 0
+#define ARCH_AVR32_UC 0
 #define ARCH_BFIN 0
 #define ARCH_IA64 0
 #define ARCH_M68K 0
 #define ARCH_MIPS 0
+#define ARCH_MIPS64 0
 #define ARCH_PARISC 0
 #define ARCH_PPC 0
+#define ARCH_PPC64 0
 #define ARCH_S390 0
 #define ARCH_SH4 0
 #define ARCH_SPARC 0

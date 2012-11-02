@@ -15,8 +15,14 @@ OBJS += $(OBJS-yes)
 FFNAME := lib$(NAME)
 FFLIBS := $(foreach,NAME,$(FFLIBS),lib$(NAME))
 
+# for LOCAL_CPPFLAGS
+FFCPPFLAGS = -DHAVE_AV_CONFIG_H -Wno-sign-compare -Wno-switch -Wno-pointer-sign
+FFCPPFLAGS += -D_ISOC99_SOURCE -D_POSIX_C_SOURCE=200112 -D_FILE_OFFSET_BITS=32 -D_LARGEFILE_SOURCE -DPIC
+
+# for LOCAL_CFLAGS
 FFCFLAGS  = -DHAVE_AV_CONFIG_H -Wno-sign-compare -Wno-switch -Wno-pointer-sign
 FFCFLAGS += -DTARGET_CONFIG=\"config-$(TARGET_ARCH).h\"
+FFCFLAGS += -std=c99 -fPIC -pthread -Wdeclaration-after-statement -Wall -Wno-switch -Wdisabled-optimization -Wpointer-arith -Wredundant-decls -Wno-pointer-sign -Wcast-qual -Wwrite-strings -Wundef -fno-math-errno -fno-tree-vectorize
 
 ALL_S_FILES := $(wildcard $(LOCAL_PATH)/$(TARGET_ARCH)/*.S)
 ALL_S_FILES := $(addprefix $(TARGET_ARCH)/, $(notdir $(ALL_S_FILES)))
