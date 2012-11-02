@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <jni.h>
 
-#include "VideoEncoder.h"
+#include "VideoEncode.h"
 
 #define JNI_VERSION 	JNI_VERSION_1_2
 #define JNIREG_CLASS 	"com/ivysee/mirage"
@@ -11,24 +11,35 @@
 JNIEXPORT jstring JNICALL native_hello(JNIEnv *env, jclass clazz)
 {
 	printf("hello in c native code.\n");
-	return (*env)->NewStringUTF(env, "hello world returned.");
+	return env->NewStringUTF("hello world returned.");
 }
 
-JNIEXPORT jvoid JNICALL native_init(JNIEnv *env, jclass clazz)
+JNIEXPORT void JNICALL native_init(JNIEnv *env, jclass clazz)
 {
 }
 
-JNIEXPORT jvoid JNICALL native_uninit(JNIEnv *env, jclass clazz)
+JNIEXPORT void JNICALL native_uninit(JNIEnv *env, jclass clazz)
 {
 }
 
-JNIEXPORT jvoid JNICALL native_rawdata(JNIEnv *env, jclass clazz, jobject handle, 
-	jarray data, jint size, jint fmt, jint width, jint height, jint orientation, jint facing)
+JNIEXPORT void JNICALL native_rawvideo(JNIEnv *env, jclass clazz, jint handle, 
+	jbyteArray array, jint len, jint fmt, jint width, jint height, jint orientation)
 {
+	jbyte *data = NULL;
+	RawFrameFormat frameFormat;
 	CVideoEncode *pEnc = (CVideoEncode *)handle;
-	if (!pEnc || size <= 0) {
-		return;
-	}
+
+	return_if_fail(pEnc != NULL && len > 0);
+
+	frameFormat.fmt = fmt;
+	frameFormat.width = width;
+	frameFormat.height = height;
+	frameFormat.orientation = orientation;
+
+	data = env->GetByteArrayElements(array, NULL);
+	return_if_fail(data != NULL);
+	//pEnc->onRawFrame(data, len, width, height, frameFormat);
+	env->ReleaseByteArrayElements(array, data, JNI_ABORT);
 }
 
 /**
@@ -45,12 +56,12 @@ static int register_native_methods(JNIEnv* env, const char* className,
         JNINativeMethod* gMethods, int numMethods)
 {
 	jclass clazz;
-	clazz = (*env)->FindClass(env, className);
+	clazz = env->FindClass(className);
 	if (clazz == NULL) {
 		return JNI_FALSE;
 	}
 
-	if ((*env)->RegisterNatives(env, clazz, gMethods, numMethods) < 0) {
+	if (env->RegisterNatives(clazz, gMethods, numMethods) < 0) {
 		return JNI_FALSE;
 	}
 
@@ -78,7 +89,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved)
 	jint ret = -1;
 	JNIEnv* env = NULL;
 
-	if ((*vm)->GetEnv(vm, (void**)&env, JNI_VERSION) != JNI_OK) {
+	if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION) != JNI_OK) {
 		return ret;
 	}
 

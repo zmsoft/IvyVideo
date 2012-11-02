@@ -1,5 +1,5 @@
 #include "SampleAllocator.h"
-#include "IvyVideo.h"
+#include "IvyCommon.h"
 
 
 //

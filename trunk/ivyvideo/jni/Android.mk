@@ -18,10 +18,12 @@ EXT_PATH := ../..
 include $(CLEAR_VARS)
 
 LOCAL_MODULE    := ivyvideo
-LOCAL_SRC_FILES := ../src/ivyvideo-jni.c \
+LOCAL_SRC_FILES := ../src/jni_ivymirage.cpp \
 	../src/Runnable.cpp  \
 	../src/SampleAllocator.cpp  \
 	../src/Timer.cpp  \
+	../src/LogTrace.cpp  \
+	../src/IvyClient.cpp \
 	../src/VideoDecode.cpp  \
 	../src/VideoEncode.cpp
 

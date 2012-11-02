@@ -1,19 +1,21 @@
 #ifndef _VIDEODECODE_H_
 #define _VIDEODECODE_H_
 
+#include "IvyCommon.h"
 #include "IvyVideo.h"
 #include "IDummyObject.h"
 
-class CVideoDecode : public IDummyObject
+class CVideoDecode : 
+	public IvyVideoDecode,
+	public IDummyObject
 {
 public:
 	CVideoDecode();
 	virtual ~CVideoDecode();
 
-	bool init();
-	void uninit();
-
-	void onPacketData(char *data, int size);
+	virtual bool init();
+	virtual void uninit();
+	virtual void onPacketData(char *data, int size);
 
 private:
 	IvyVideoDecodeSink *mDecodeSink;

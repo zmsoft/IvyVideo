@@ -1,6 +1,7 @@
 #ifndef _VIDEOENCODE_H_
 #define _VIDEOENCODE_H_
 
+#include "IvyCommon.h"
 #include "IvyVideo.h"
 #include "MutexLock.h"
 #include "Timer.h"
@@ -9,16 +10,18 @@
 #include "FFmpegEncoder.h"
 
 
-class CVideoEncode : public IDummyObject, public CTimer
+class CVideoEncode : 
+	public IvyVideoEncode,
+	public CTimer,
+	public IDummyObject
 {
 public:
 	CVideoEncode();
 	virtual ~CVideoEncode();
 
-	bool init();
-	void uninit();
-
-	void onRawFrame(char *data, int size, int width, int height, int format);
+	virtual bool init();
+	virtual void uninit();
+	virtual void onRawFrame(char *data, int size, int width, int height, int format);
 
 protected:
 	virtual void onTimer();
