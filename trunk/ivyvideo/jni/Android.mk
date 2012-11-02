@@ -15,33 +15,6 @@
 LOCAL_PATH := $(call my-dir)
 EXT_PATH := ../..
 
-
-include $(CLEAR_VARS)
-LOCAL_MODULE := libivyffmpeg
-LOCAL_SRC_FILES := $(EXT_PATH)/ivyffmpeg/build/android/obj/local/armeabi-v7a/libivyffmpeg.a
-include $(PREBUILT_STATIC_LIBRARY)
-
-include $(CLEAR_VARS)
-LOCAL_MODULE := avcodec
-LOCAL_SRC_FILES := $(EXT_PATH)/ivyffmpeg/ffmpeg/build/android/obj/local/armeabi-v7a/libavcodec.a
-include $(PREBUILT_STATIC_LIBRARY)
-
-include $(CLEAR_VARS)
-LOCAL_MODULE := avformat
-LOCAL_SRC_FILES := $(EXT_PATH)/ivyffmpeg/ffmpeg/build/android/obj/local/armeabi-v7a/libavformat.a
-include $(PREBUILT_STATIC_LIBRARY)
-
-include $(CLEAR_VARS)
-LOCAL_MODULE := avutil
-LOCAL_SRC_FILES := $(EXT_PATH)/ivyffmpeg/ffmpeg/build/android/obj/local/armeabi-v7a/libavutil.a
-include $(PREBUILT_STATIC_LIBRARY)
-
-include $(CLEAR_VARS)
-LOCAL_MODULE := swscale
-LOCAL_SRC_FILES := $(EXT_PATH)/ivyffmpeg/ffmpeg/build/android/obj/local/armeabi-v7a/libswscale.a
-include $(PREBUILT_STATIC_LIBRARY)
-
-
 include $(CLEAR_VARS)
 
 LOCAL_MODULE    := ivyvideo
@@ -52,11 +25,10 @@ LOCAL_SRC_FILES := ../src/ivyvideo-jni.c \
 	../src/VideoDecode.cpp  \
 	../src/VideoEncode.cpp
 
-LOCAL_STATIC_LIBRARIES := libivyffmpeg libavcodec libavformat libavutil libswscale
-
+LOCAL_STATIC_LIBRARIES := 
 LOCAL_SHARED_LIBRARIES := 
 
-LOCAL_LDLIBS := -lz
+LOCAL_LDLIBS := -L$(EXT_PATH)/ivyffmpeg/build/libs/armeabi-v7a -livyffmpeg
 
 LOCAL_C_INCLUDES := 		\
 	$(LOCAL_PATH)		\
