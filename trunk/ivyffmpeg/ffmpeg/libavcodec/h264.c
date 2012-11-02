@@ -75,8 +75,8 @@ static VLC run7_vlc;
 static VLC_TYPE run7_vlc_table[96][2];
 static const int run7_vlc_table_size = 96;
 
-static void svq3_luma_dc_dequant_idct_c(DCTELEM *block, int qp);
-static void svq3_add_idct_c(uint8_t *dst, DCTELEM *block, int stride, int qp, int dc);
+/*static*/ void svq3_luma_dc_dequant_idct_c(DCTELEM *block, int qp);
+/*static*/ void svq3_add_idct_c(uint8_t *dst, DCTELEM *block, int stride, int qp, int dc);
 static void filter_mb( H264Context *h, int mb_x, int mb_y, uint8_t *img_y, uint8_t *img_cb, uint8_t *img_cr, unsigned int linesize, unsigned int uvlinesize);
 static void filter_mb_fast( H264Context *h, int mb_x, int mb_y, uint8_t *img_y, uint8_t *img_cb, uint8_t *img_cr, unsigned int linesize, unsigned int uvlinesize);
 static Picture * remove_long(H264Context *h, int i, int ref_mask);
