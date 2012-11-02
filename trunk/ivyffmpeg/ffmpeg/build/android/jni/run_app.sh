@@ -4,7 +4,9 @@ if [ $# != 1 ]; then
 fi
 
 mod=$1
-modlist="avcodec avformat avutil swscale "
+modlist="avutil avcodec avformat swscale postproc avfilter "
+libpath=../libs/armeabi-v7a
+dstpath=../../../../build/libs/armeabi-v7a
 
 if [ $mod = "all" ]; then
     echo "[*] building all ...."
@@ -31,7 +33,8 @@ APP_ABI := armeabi-v7a
 APP_STL := stlport_static
 EOF
     cp Android-$m.mk Android.mk
-    ndk-build
+    ndk-build 2>/tmp/err.log
+    cp -f $libpath/lib$app.so $dstpath/
 done
 
 exit 0

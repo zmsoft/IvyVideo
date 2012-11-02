@@ -12,7 +12,9 @@ LOCAL_SRC_FILES:= \
 	FFmpegAudioParam.cpp 
 
 LOCAL_SHARED_LIBRARIES := 
-LOCAL_STATIC_LIBRARIES := libavcodec libavformat libavutil
+LOCAL_STATIC_LIBRARIES := 
+
+LOCAL_LDLIBS := -L../../libs/armeabi-v7a -lavutil -lavcodec -lavformat -lswscale
 
 LOCAL_MODULE := libivyffmpeg
 
@@ -22,4 +24,4 @@ LOCAL_C_INCLUDES := 		\
 
 LOCAL_CFLAGS := 
 
-include $(BUILD_STATIC_LIBRARY)
+include $(BUILD_SHARED_LIBRARY)
