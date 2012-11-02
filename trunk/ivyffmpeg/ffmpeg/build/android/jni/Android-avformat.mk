@@ -17,6 +17,8 @@ LOCAL_CFLAGS += -include "string.h" -Dipv6mr_interface=ipv6mr_ifindex
 LOCAL_SHARED_LIBRARIES := 
 LOCAL_STATIC_LIBRARIES := $(FFLIBS)
 
+LOCAL_LDLIBS := -L../obj/local/armeabi-v7a -lavutil -lavcodec
+
 LOCAL_MODULE := $(FFNAME)
 
-include $(BUILD_STATIC_LIBRARY)
+include $(BUILD_SHARED_LIBRARY)

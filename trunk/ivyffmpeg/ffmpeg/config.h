@@ -60,7 +60,7 @@
 #define HAVE_MEMALIGN 1
 #define HAVE_MKSTEMP 1
 #define HAVE_PLD 0
-#define HAVE_POSIX_MEMALIGN 1
+#define HAVE_POSIX_MEMALIGN 0
 #define HAVE_ROUND 1
 #define HAVE_ROUNDF 1
 #define HAVE_SDL 0
@@ -149,7 +149,7 @@
 #define CONFIG_VDPAU 0
 #define CONFIG_VERSION3 0
 #define CONFIG_X11GRAB 0
-#define CONFIG_ZLIB 1
+#define CONFIG_ZLIB 0
 #define CONFIG_GPLV3 0
 #define CONFIG_LGPLV3 0
 #define CONFIG_AASC_DECODER 0
