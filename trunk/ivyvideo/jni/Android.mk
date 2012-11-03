@@ -39,6 +39,6 @@ LOCAL_C_INCLUDES := 		\
 	$(EXT_PATH)/ivyffmpeg/ffmpeg 		\
 	$(EXT_PATH)/ivyffmpeg/src 		
 
-LOCAL_CFLAGS := 
+LOCAL_CFLAGS := -DANDROID
 
 include $(BUILD_SHARED_LIBRARY)
