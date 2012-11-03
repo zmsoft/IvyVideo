@@ -14,6 +14,11 @@ FFmpegAudioParam::~FFmpegAudioParam()
 {
 }
 
+bool FFmpegAudioParam::empty()
+{
+    return bitRate < 1 && sampleRate < 1 && channels < 1 && audioCodecName == "";
+}
+
 bool FFmpegAudioParam::isValid()
 {
     // valid the arguments
@@ -25,7 +30,3 @@ bool FFmpegAudioParam::isValid()
     return true;
 }
 
-bool FFmpegAudioParam::empty()
-{
-    return bitRate < 1 && sampleRate < 1 && channels < 1 && audioCodecName == "";
-}

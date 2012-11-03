@@ -30,7 +30,7 @@ void CIvyClient::uninit()
 bool CIvyClient::startSelfVideo()
 {
     if (mVideoEncode == NULL) {
-        mVideoEncode = new CVideoEncode();
+        mVideoEncode = new CVideoEncode(this);
     }
 
     //TODO: query capture capability and host performance to

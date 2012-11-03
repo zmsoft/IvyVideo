@@ -1,13 +1,26 @@
 #include "FFmpegEncoder.h"
 
-#include <string>
-using namespace std;
-
 // define the max audio packet size as 128 KB
 #define MAX_AUDIO_PACKET_SIZE (128 * 1024)
 
 
-FFmpegEncoder::FFmpegEncoder(const FFmpegVideoParam &videoParam, const FFmpegAudioParam &audioParam) : videoParam(videoParam), audioParam(audioParam)
+FFmpegEncoder::FFmpegEncoder(const FFmpegVideoParam &vp, const FFmpegAudioParam &ap) : 
+    videoParam(vp), audioParam(ap)
+{
+    init();
+}
+
+FFmpegEncoder::FFmpegEncoder(const FFmpegVideoParam &vp) : videoParam(vp)
+{
+    init();
+}
+
+FFmpegEncoder::FFmpegEncoder(const FFmpegAudioParam &ap) : audioParam(ap)
+{
+    init();
+}
+
+void FFmpegEncoder::init()
 {
     // initialize the private fields
     this->outputContext = NULL;
@@ -430,7 +443,8 @@ int FFmpegEncoder::open(const char *fileName)
     }
 
     this->hasOutput = (fileName != NULL) && (fileName[0] != 0);
-    if (!this->hasOutput && this->videoParam.videoCodecName.empty() && this->audioParam.audioCodecName.empty())
+    if (!this->hasOutput && this->videoParam.videoCodecName.empty() && 
+            this->audioParam.audioCodecName.empty())
     {
         return -2;
     }
@@ -464,7 +478,8 @@ int FFmpegEncoder::open(const char *fileName)
     if (this->encodeVideo)
     {
         // validate the video codec
-        if ((!outputFormat || outputFormat->video_codec == CODEC_ID_NONE) && this->videoParam.videoCodecName.empty())
+        if ((!outputFormat || outputFormat->video_codec == CODEC_ID_NONE) && 
+                this->videoParam.videoCodecName.empty())
         {
             return -1;
         }
@@ -481,6 +496,7 @@ int FFmpegEncoder::open(const char *fileName)
             // otherwise, use the codec guessed from the filename
             videoCodec = avcodec_find_encoder(outputFormat->video_codec);
         }
+
         if (!videoCodec)
         {
             return -1;
@@ -549,7 +565,7 @@ int FFmpegEncoder::open(const char *fileName)
             if (   this->videoFrame == NULL
                 || avpicture_alloc(this->videoFrame, videoCodecContext->pix_fmt, videoCodecContext->width, videoCodecContext->height) < 0 )
             {
-                return -2;
+                return -1;
             }
         }
     }
@@ -680,3 +696,4 @@ void FFmpegEncoder::close()
     this->opened = false;
     this->hasOutput = false;
 }
+

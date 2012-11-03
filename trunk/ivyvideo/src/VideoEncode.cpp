@@ -2,10 +2,9 @@
 #include "IvyUtil.h"
 #include "LogTrace.h"
 
-CVideoEncode::CVideoEncode()
+CVideoEncode::CVideoEncode(IvyVideoEncodeSink *sink) : mEncodeSink(sink)
 {
     mSample = NULL;
-    mEncodeSink = NULL;
     mEncoder = NULL;
 }
 

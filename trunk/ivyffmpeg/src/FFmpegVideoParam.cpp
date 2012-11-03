@@ -24,6 +24,12 @@ FFmpegVideoParam::~FFmpegVideoParam()
 {
 }
 
+bool FFmpegVideoParam::empty()
+{
+    return width < 1 && height < 1 && pixelFormat == PIX_FMT_NONE  && 
+        bitRate < 1 && frameRate < 1 && videoCodecName == "";
+}
+
 bool FFmpegVideoParam::isValid()
 {
     // valid the arguments
@@ -35,8 +41,3 @@ bool FFmpegVideoParam::isValid()
     return true;
 }
 
-bool FFmpegVideoParam::empty()
-{
-    return width < 1 && height < 1 && pixelFormat == PIX_FMT_NONE  && 
-        bitRate < 1 && frameRate < 1 && videoCodecName == "";
-}

@@ -1,6 +1,22 @@
 #include "FFmpegDecoder.h"
 
-FFmpegDecoder::FFmpegDecoder()
+FFmpegDecoder::FFmpegDecoder(const FFmpegVideoParam &vp, const FFmpegAudioParam &ap) : 
+    videoParam(vp), audioParam(ap)
+{
+    init();
+}
+
+FFmpegDecoder::FFmpegDecoder(const FFmpegVideoParam &vp) : videoParam(vp)
+{
+    init();
+}
+
+FFmpegDecoder::FFmpegDecoder(const FFmpegAudioParam &ap) : audioParam(ap)
+{
+    init();
+}
+
+void FFmpegDecoder::init()
 {
     // initialize the private fields
     this->inputContext     = NULL;
@@ -16,9 +32,10 @@ FFmpegDecoder::FFmpegDecoder()
     this->audioPacketSize  = 0;
     this->currentPacketPts = 0;
     this->currentPacketDts = 0;
-    this->decodeVideo      = false;
-    this->decodeAudio      = false;
     this->opened           = false;
+    this->hasInput         = false;
+    this->decodeVideo      = !this->videoParam.empty();
+    this->decodeAudio      = !this->audioParam.empty();
 
     // register all codecs and demux
     av_register_all();
@@ -90,94 +107,177 @@ int FFmpegDecoder::open(const char *fileName)
         return -1;
     }
 
-    // open a media file as input.
-    // The codecs are not opened. Only the file header (if present) is read
-    if (av_open_input_file(&this->inputContext, fileName, NULL, 0, NULL))
+    this->hasInput = (fileName != NULL) && (fileName[0] != 0);
+    if (!this->hasInput && this->videoParam.videoCodecName.empty() && 
+            this->audioParam.audioCodecName.empty())
     {
-        return -2;
+        return -1;
     }
 
-    // Read packets of a media file to get stream information.
-    if (av_find_stream_info(this->inputContext) < 0)
+    if (this->hasInput) 
     {
-        return -3;
-    }
+        this->decodeVideo = false;
+        this->decodeAudio = false;
 
-    // find the video/audio stream
-    for (size_t i = 0; i < this->inputContext->nb_streams; i++)
-    {
-        // TODO
-        // there might be several audio or video streams,
-        // however, only one audio/video stream is used here
-        if (!this->videoStream && this->inputContext->streams[i]->codec->codec_type == CODEC_TYPE_VIDEO)
+        // open a media file as input.
+        // The codecs are not opened. Only the file header (if present) is read
+        if (av_open_input_file(&this->inputContext, fileName, NULL, 0, NULL))
         {
-            this->videoStream = this->inputContext->streams[i];
-            this->decodeVideo = true;
-            continue;
+            return -2;
         }
 
-        if (!this->audioStream && this->inputContext->streams[i]->codec->codec_type == CODEC_TYPE_AUDIO)
+        // Read packets of a media file to get stream information.
+        if (av_find_stream_info(this->inputContext) < 0)
         {
-            this->audioStream = this->inputContext->streams[i];
-            this->decodeAudio = true;
-            continue;
+            return -3;
+        }
+
+        // find the video/audio stream
+        for (size_t i = 0; i < this->inputContext->nb_streams; i++)
+        {
+            // TODO
+            // there might be several audio or video streams,
+            // however, only one audio/video stream is used here
+            if (!this->videoStream && 
+                    this->inputContext->streams[i]->codec->codec_type == CODEC_TYPE_VIDEO)
+            {
+                this->videoStream = this->inputContext->streams[i];
+                this->decodeVideo = true;
+                continue;
+            }
+
+            if (!this->audioStream && 
+                    this->inputContext->streams[i]->codec->codec_type == CODEC_TYPE_AUDIO)
+            {
+                this->audioStream = this->inputContext->streams[i];
+                this->decodeAudio = true;
+                continue;
+            }
+        }
+    }
+    else
+    {
+        // allocate the output media context
+        this->inputContext = av_alloc_format_context();
+        if (!this->inputContext)
+        {
+            return -1;
         }
     }
 
     // video related initialization if necessary
     if (this->decodeVideo)
     {
-        // initialize the video codec
-        AVCodecContext *videoCodecContext = this->videoStream->codec;
-        AVCodec *videoCodec = avcodec_find_decoder(videoCodecContext->codec_id);
+        // find the video encoder
+        AVCodec *videoCodec = NULL;
+        if (this->hasInput)
+        {
+            // initialize the video codec
+            AVCodecContext *videoCodecContext = this->videoStream->codec;
+            videoCodec = avcodec_find_decoder(videoCodecContext->codec_id);
+        }
+        else
+        {
+            // use the codec name preferentially if it is specified in the input param
+            videoCodec = avcodec_find_decoder_by_name(this->videoParam.videoCodecName.c_str());
+
+            // add the video stream with stream id 0
+            this->videoStream = av_new_stream(this->inputContext, 0);
+            if (!this->videoStream)
+            {
+                return -1;
+            }
+        }
+
         if (!videoCodec)
         {
-            return -4;
+            return -1;
         }
 
         // get the video parameters
-        this->videoParam.width       = videoCodecContext->width;
-        this->videoParam.height      = videoCodecContext->height;
-        this->videoParam.pixelFormat = videoCodecContext->pix_fmt;
-        this->videoParam.bitRate     = videoCodecContext->bit_rate;
-        this->videoParam.frameRate   = this->videoStream->r_frame_rate.num / this->videoStream->r_frame_rate.den;
+        AVCodecContext *videoCodecContext = this->videoStream->codec;
+        if (this->hasInput)
+        {
+            this->videoParam.width       = videoCodecContext->width;
+            this->videoParam.height      = videoCodecContext->height;
+            this->videoParam.pixelFormat = videoCodecContext->pix_fmt;
+            this->videoParam.bitRate     = videoCodecContext->bit_rate;
+            this->videoParam.frameRate   = this->videoStream->r_frame_rate.num / this->videoStream->r_frame_rate.den;
+        }
+        else 
+        {
+            videoCodecContext->codec_id     = videoCodec->id;
+            videoCodecContext->codec_type   = CODEC_TYPE_VIDEO;
+            videoCodecContext->width        = this->videoParam.width;
+            videoCodecContext->height       = this->videoParam.height;
+            videoCodecContext->pix_fmt      = this->videoParam.pixelFormat;
+            videoCodecContext->bit_rate     = this->videoParam.bitRate;
+            this->videoStream->r_frame_rate.den = this->videoParam.frameRate;
+            this->videoStream->r_frame_rate.num = 1;
+        }
 
         // open the video codec
         if (avcodec_open(videoCodecContext, videoCodec))
         {
-            return -5;
+            return -1;
         }
 
-        // allocate the video frame to be encoded
+        // allocate the video frame to be decoded
         this->videoBufferSize  = avpicture_get_size(this->videoParam.pixelFormat, this->videoParam.width, this->videoParam.height);
         this->videoFrameSize   = 0;
         this->videoFrameBuffer = (uint8_t *)av_malloc(this->videoBufferSize);
-        if (!this->videoFrameBuffer)
-        {
-            return -6;
-        }
     }
 
     // audio related initialization if necessary
     if (this->decodeAudio)
     {
-        // initialize the audio codec
-        AVCodecContext *audioCodecContext = this->audioStream->codec;
-        AVCodec *audioCodec = avcodec_find_decoder(audioCodecContext->codec_id);
+        // find the video encoder
+        AVCodec *audioCodec = NULL;
+        if (this->hasInput)
+        {
+            // initialize the audio codec
+            AVCodecContext *audioCodecContext = this->audioStream->codec;
+            audioCodec = avcodec_find_decoder(audioCodecContext->codec_id);
+        }
+        else
+        {
+            // use the codec name preferentially if it is specified in the input param
+            audioCodec = avcodec_find_decoder_by_name(this->audioParam.audioCodecName.c_str());
+
+            // add the audio stream with stream id 1
+            this->audioStream = av_new_stream(this->inputContext, 1);
+            if (!this->videoStream)
+            {
+                return -1;
+            }
+        }
+
         if (!audioCodec)
         {
-            return -7;
+            return -1;
         }
 
         // get the audio parameters
-        this->audioParam.sampleRate = audioCodecContext->sample_rate;
-        this->audioParam.channels   = audioCodecContext->channels;
-        this->audioParam.bitRate    = audioCodecContext->bit_rate;
+        AVCodecContext *audioCodecContext = this->audioStream->codec;
+        if (this->hasInput)
+        {
+            this->audioParam.sampleRate = audioCodecContext->sample_rate;
+            this->audioParam.channels   = audioCodecContext->channels;
+            this->audioParam.bitRate    = audioCodecContext->bit_rate;
+        }
+        else
+        {
+            audioCodecContext->codec_id     = audioCodec->id;
+            audioCodecContext->codec_type   = CODEC_TYPE_AUDIO;
+            audioCodecContext->sample_rate  = this->audioParam.sampleRate;
+            audioCodecContext->channels     = this->audioParam.channels;
+            audioCodecContext->bit_rate     = this->audioParam.bitRate;
+        }
 
         // open the audio codec
         if (avcodec_open(audioCodecContext, audioCodec))
         {
-            return -8;
+            return -1;
         }
 
         // allocate output buffer
@@ -209,6 +309,7 @@ void FFmpegDecoder::close()
         this->videoFrameSize = 0;
         this->videoBufferSize = 0;
     }
+
     if (this->decodeAudio)
     {
         avcodec_close(this->audioStream->codec);
@@ -371,3 +472,4 @@ int FFmpegDecoder::decodeAudioFrame()
 
     return 0;
 }
+

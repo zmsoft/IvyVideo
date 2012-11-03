@@ -52,6 +52,9 @@ public:
     ///	
     bool empty();
 
+    ///
+    ///	@brief  Judge whether a FFmpegVideoParam object's parameters are right
+    ///	
     bool isValid();
 
 public:
@@ -64,3 +67,4 @@ public:
 };
 
 #endif
+

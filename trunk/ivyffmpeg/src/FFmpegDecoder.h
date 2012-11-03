@@ -9,8 +9,6 @@ extern "C"
 #include "FFmpegVideoParam.h"
 #include "FFmpegAudioParam.h"
 
-#include <string>
-using namespace std;
 
 #ifdef WIN32
 #ifdef DLL_FILE
@@ -40,7 +38,13 @@ public:
     ///
     /// @brief  Constructor for initializing an object of FFmpegDecoder.
     ///
-    FFmpegDecoder();
+    FFmpegDecoder(const FFmpegVideoParam &videoParam, const FFmpegAudioParam &audioParam);
+
+    // only video
+    FFmpegDecoder(const FFmpegVideoParam &videoParam);
+
+    // only audio
+    FFmpegDecoder(const FFmpegAudioParam &audioParam);
 
     ///
     /// @brief  Destructor
@@ -83,7 +87,7 @@ public:
     /// If the return value of decodeFrame() is 0 (i.e. video stream),
     /// use this method to get the size of the decoded video frame.
     ///
-    /// @return An int representing the bytes of the decoded video frame (unit: in bytes/uint8_t).
+    /// @return An int representing the bytes of decoded video frame (unit: in bytes/uint8_t).
     ///
     int getVideoFrameSize() const;
 
@@ -93,7 +97,7 @@ public:
     /// If the return value of decodeFrame() is 1 (i.e. audio stream),
     /// use this method to get decoded audio frame.
     ///
-    /// Use getAudioFrameSize() to get the returned size of the decoded audio frame data (unit: in bytes/uint8_t).
+    /// Use getAudioFrameSize() to get the returned size of decoded audio frame data (unit: in bytes/uint8_t).
     ///
     /// @return A uint8_t pointer representing the decoded frame.
     ///
@@ -171,12 +175,13 @@ private:
 
     bool decodeVideo;           ///< Whether video decoding is needed
     bool decodeAudio;           ///< Whether audio decoding is needed
+    bool hasInput;              ///< Whether there is a input file for decoding
     bool opened;                ///< Whether the FFmpegDecoder is opened yet
     FFmpegVideoParam videoParam;        ///< The video parameters of the video to be decoded
     FFmpegAudioParam audioParam;        ///< The audio parameters of the audio to be decoded
     AVFormatContext *inputContext;      ///< The input format context
-    AVStream *videoStream;              ///< The video output stream
-    AVStream *audioStream;              ///< The audio output stream
+    AVStream *videoStream;              ///< The video input stream
+    AVStream *audioStream;              ///< The audio input stream
     AVPacket currentPacket;		///< the packet read from the input file currently
     uint8_t *videoFrameBuffer;  ///< The buffer storing one output video frame data
     int      videoFrameSize;    ///< The size of the output video frame
@@ -197,6 +202,9 @@ private:
     //
     //////////////////////////////////////////////////////////////////////////
 
+    // init parameters for decode
+    void init();
+
     ///
     /// @brief  Read a packet from the input file
     ///
@@ -205,14 +213,15 @@ private:
     int readFrame();
 
     ///
-    /// @brief  Decode a video frame from the current packet, and store it in the video frame buffer
+    /// @brief  Decode a video frame from current packet, and store it in the video frame buffer
     ///
     int decodeVideoFrame();
 
     ///
-    /// @brief  Decode an audio frame from the current packet, and store it in the audio frame buffer
+    /// @brief  Decode an audio frame from current packet, and store it in the audio frame buffer
     ///
     int decodeAudioFrame();
 };
 
 #endif
+

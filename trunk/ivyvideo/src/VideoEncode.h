@@ -16,7 +16,7 @@ class CVideoEncode :
     public IDummyObject
 {
 public:
-    CVideoEncode();
+    CVideoEncode(IvyVideoEncodeSink *sink);
     virtual ~CVideoEncode();
 
     virtual bool init(int width, int height, int fmt, int fps, int bandwidth);
