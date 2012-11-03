@@ -10,6 +10,16 @@ FFmpegVideoParam::FFmpegVideoParam() :
 {
 }
 
+void FFmpegVideoParam::setVideoParam(int w, int h, PixelFormat fmt, int br, int fr, std::string codec)
+{
+    width = w;
+    height = h;
+    pixelFormat = fmt;
+    bitRate = br;
+    frameRate = fr;
+    videoCodecName = codec;
+}
+
 FFmpegVideoParam::~FFmpegVideoParam()
 {
 }

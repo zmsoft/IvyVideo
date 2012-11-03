@@ -5,32 +5,33 @@
 #include "IvyVideo.h"
 
 class CIvyClient : 
-	public IvyVideoEncodeSink,
-	public IvyVideoDecodeSink
+    public IvyVideoEncodeSink,
+    public IvyVideoDecodeSink
 {
 public:
-	CIvyClient();
-	~CIvyClient();
+    CIvyClient();
+    ~CIvyClient();
 
-	bool init();
-	void uninit();
+    bool init();
+    void uninit();
 
-	// for video encoder and send
-	bool startSelfVideo();
-	bool stopSelfVideo();
-	
-	// for video recv and decoder
-	bool requestPeerVideo();
-	bool cancelPeerVideo();
+    // for video encoder and send
+    bool startSelfVideo();
+    bool stopSelfVideo();
 
-	// for IvyVideoEncodeSink
-	virtual void onPacked(char *data, int size, int type);
+    // for video recv and decoder
+    bool requestPeerVideo();
+    bool cancelPeerVideo();
 
-	// for IvyVideoDecodeSink
-	virtual void onDecoded(char *data, int size, int format);
-	
+    // for IvyVideoEncodeSink
+    virtual void onPacked(char *data, int size, int type);
+
+    // for IvyVideoDecodeSink
+    virtual void onDecoded(char *data, int size, int format);
+
 private:
-
+    IvyVideoEncode *mVideoEncode;
+    IvyVideoDecode *mVideoDecode;
 };
 
 #endif // _IVYCLIENT_H_

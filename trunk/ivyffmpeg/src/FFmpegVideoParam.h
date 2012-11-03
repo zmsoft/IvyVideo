@@ -41,6 +41,7 @@ public:
     ///
     FFmpegVideoParam();
 
+    void setVideoParam(int width, int height, PixelFormat pixelFormat, int bitRate, int frameRate, std::string videoCodecName = "");
     ///
     /// @brief  Destructor
     ///
