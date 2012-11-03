@@ -22,8 +22,7 @@ bool CVideoEncode::init(int width, int height, int fmt, int fps, int bandwidth)
 
     // init with defalut parameters
     mEncodeParam.setVideoParam(width, height, (PixelFormat)pixFmt, bandwidth, fps);
-    FFmpegAudioParam audioNull;
-    mEncoder = new FFmpegEncoder(mEncodeParam, audioNull);
+    mEncoder = new FFmpegEncoder(mEncodeParam);
 
     if(mEncoder->open() != 0) {
         LOGE("FFmpegEncoder.open() failed");
