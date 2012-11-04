@@ -18,7 +18,7 @@ bool CVideoEncode::init(int width, int height, int fmt, int fps, int bandwidth, 
     LOGI("CVideoEncode.init() begin, codec: %s", codec);
 
     int pixFmt;
-    return_val_if_fail(getPixelFormat(fmt, pixFmt), false);
+    returnf_if_fail(getPixelFormat(fmt, pixFmt));
 
     // init with defalut parameters
     mEncodeParam.setVideoParam(width, height, (PixelFormat)pixFmt, bandwidth, fps, codec);
@@ -54,6 +54,7 @@ void CVideoEncode::onRawFrame(char *data, int size, RawFrameFormat format)
 {
     LOGI("CVideoEncode.onRawFrame() begin, encode[%d, %d], input[%d, %d]",
         mEncodeParam.width, mEncodeParam.height, format.width, format.height);
+    return_if_fail(format.fmt == ANDROID_NV21);
 
     CAutoLock lock(mMutex);
     if (mSample) {
@@ -67,9 +68,12 @@ void CVideoEncode::onRawFrame(char *data, int size, RawFrameFormat format)
         mSample = CSampleAllocator::inst()->allocSample(size);
         return_if_fail(mSample != NULL);
         mSample->addRef();
-        mSample->setFormat(format.width, format.height, format.fmt);
     }
-    mSample->setData(data, size);
+    
+    return_if_fail(mSample->setDataSize(size));
+    NV21toI420(data, mSample->getDataPtr(), format.width, format.height, 8);
+    format.fmt = CSP_I420;
+    mSample->setFormat(format.width, format.height, format.fmt);
 }
 
 // 
@@ -87,18 +91,16 @@ void CVideoEncode::onTimer()
     }
     mMutex.off();
 
-    if (pSample) {
-        LOGI("CVideoEncode::onTimer, get one frame and encode it");
-        int size = mEncoder->encodeVideoFrame((const uint8_t *)pSample->getDataPtr());
-        if (size > 0) {
-            // maybe rtp pack
-            if (mEncodeSink) {
-                mEncodeSink->onPacked((char *)mEncoder->getVideoEncodedBuffer(), size, PT_RAW);
-            }
+    return_if_fail(pSample != NULL);
+
+    LOGI("CVideoEncode::onTimer, get one frame and encode it");
+    int size = mEncoder->encodeVideoFrame((const uint8_t *)pSample->getDataPtr());
+    if (size > 0) {
+        // maybe rtp pack
+        if (mEncodeSink) {
+            mEncodeSink->onPacked((char *)mEncoder->getVideoEncodedBuffer(), size, PT_RAW);
         }
-
-        pSample->release();
     }
+    pSample->release();
 }
-
 

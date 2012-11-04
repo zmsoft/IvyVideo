@@ -49,6 +49,11 @@ enum BandWidthProfile_t {
     BW_HIGH_LINK,
 };
 
+enum AndroidCSP_t {
+    ANDROID_NV21 = 17,
+    ANDROID_YV12 = 854321,
+};
+
 #ifndef MAX_SIZE
 #define MAX_SIZE         260
 #endif
@@ -62,12 +67,21 @@ enum BandWidthProfile_t {
 #endif
 
 #ifndef return_if_fail
-#define return_if_fail(p)    do { if(!(p)) {return;} } while(0)
+#define return_if_fail(p)       do { if(!(p)) {return;} } while(0)
 #endif
 
-#ifndef return_val_if_fail
-#define return_val_if_fail(p, v)    do { if(!(p)) {return (v);} } while(0)
+#ifndef returnf_if_fail
+#define returnf_if_fail(p)      do { if(!(p)) {return false;} } while(0)
 #endif
+
+#ifndef returnv_if_fail
+#define returnv_if_fail(p, v)   do { if(!(p)) {return (v);} } while(0)
+#endif
+
+#ifndef SAFE_RELEASE
+#define SAFE_RELEASE(p)         do {if (p) {delete p; p = NULL;} } while(0)
+#endif
+
 
 typedef struct RawFrameFormat_t {
     int fmt;            // enum ColorSpace

@@ -30,11 +30,12 @@ void CRunnable::stopRun()
 void *CRunnable::run(void *param)
 {
     CRunnable *p = (CRunnable *)param;
-    if (p) {
-        p->loopRun();
-        p->mStatus = S_Quit;
+    if (!p) {
+        return NULL;
     }
 
+    p->loopRun();
+    p->mStatus = S_Quit;
     return NULL;
 }
 

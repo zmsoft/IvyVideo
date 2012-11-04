@@ -5,6 +5,7 @@
 #include "IvyVideo.h"
 #include "LogTrace.h"
 #include "IvyClient.h"
+#include "IvyUtil.h"
 
 #define JNI_VERSION 	JNI_VERSION_1_2
 #define JNIREG_CLASS 	"com/ivysee/mirage/IvyMirage"
@@ -64,6 +65,7 @@ JNIEXPORT void JNICALL native_rawvideo(JNIEnv *env, jclass clazz,
 {
     //LOGI("native_rawvideo called, begin");
     return_if_fail(len > 0);
+    return_if_fail(fmt == ANDROID_NV21 || fmt == ANDROID_YV12);
 
     RawFrameFormat frameFormat;
     frameFormat.fmt = fmt;
