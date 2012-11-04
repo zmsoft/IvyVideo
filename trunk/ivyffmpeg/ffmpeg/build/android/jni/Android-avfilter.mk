@@ -3,6 +3,8 @@ LOCAL_PATH := $(ROOT_PATH)/libavfilter
 EXT_PATH := $(ROOT_PATH)/..
 include $(CLEAR_VARS)
 
+LOCAL_ARM_MODE := arm
+
 include $(LOCAL_PATH)/../av.mk
 
 LOCAL_SRC_FILES := $(FFFILES)

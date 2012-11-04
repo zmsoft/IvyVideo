@@ -3,6 +3,8 @@ LOCAL_PATH := $(ROOT_PATH)/libavcodec
 EXTERNAL := $(ROOT_PATH)/..
 include $(CLEAR_VARS)
 
+LOCAL_ARM_MODE := arm
+
 TARGET_ARCH := arm
 include $(LOCAL_PATH)/../av.mk
 
@@ -12,7 +14,8 @@ LOCAL_C_INCLUDES :=		\
 	$(LOCAL_PATH)		\
 	$(LOCAL_PATH)/..
 
-LOCAL_CFLAGS += $(FFCFLAGS)
+LOCAL_CFLAGS += $(FFCFLAGS) \
+		../../../x264
 
 LOCAL_SHARED_LIBRARIES := 
 LOCAL_STATIC_LIBRARIES := $(FFLIBS)
