@@ -6,19 +6,19 @@
 #include "IDummyObject.h"
 
 class CVideoDecode : 
-	public IvyVideoDecode,
-	public IDummyObject
+    public IvyVideoDecode,
+    public IDummyObject
 {
 public:
-	CVideoDecode();
-	virtual ~CVideoDecode();
+    CVideoDecode();
+    virtual ~CVideoDecode();
 
-	virtual bool init();
-	virtual void uninit();
-	virtual void onPacketData(char *data, int size);
+    virtual bool init();
+    virtual void uninit();
+    virtual void onPacketData(char *data, int size);
 
 private:
-	IvyVideoDecodeSink *mDecodeSink;
+    IvyVideoDecodeSink *mDecodeSink;
 };
 
 

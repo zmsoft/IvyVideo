@@ -3,6 +3,7 @@
 
 #include "IvyCommon.h"
 #include "IvyVideo.h"
+#include "MutexLock.h"
 
 class CIvyClient : 
     public IvyVideoEncodeSink,
@@ -36,6 +37,9 @@ public:
 private:
     IvyVideoEncode *mVideoEncode;
     IvyVideoDecode *mVideoDecode;
+
+    CMutex mEncodeMutex;
+    CMutex mDecodeMutex;
 
     static CIvyClient *mClient;
 };

@@ -4,21 +4,21 @@
 class CRtpPacket
 {
 public:
-	char *getRtpHeader();
-	char *getRtpBody();
-		
-	int getHeaderSize();
-	int getBodySize();
-	unsigned short getRtpSeq();
-	int getRtpMask();
-	
-	void setRtpSeq();
-	void setRtpMask();
-	bool setRtpBody(char *data);
-	
+    char *getRtpHeader();
+    char *getRtpBody();
+
+    int getHeaderSize();
+    int getBodySize();
+    unsigned short getRtpSeq();
+    int getRtpMask();
+
+    void setRtpSeq();
+    void setRtpMask();
+    bool setRtpBody(char *data);
+
 private:
-	char *mData;
-	int mSize;
+    char *mData;
+    int mSize;
 };
 
 #endif

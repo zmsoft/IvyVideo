@@ -10,13 +10,13 @@ CVideoDecode::~CVideoDecode()
 
 bool CVideoDecode::init()
 {
-	// init ffmpeg decode
-	return true;
+    // init ffmpeg decode
+    return true;
 }
 
 void CVideoDecode::uninit()
 {
-	
+
 }
 
 void CVideoDecode::onPacketData(char *data, int size)

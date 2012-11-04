@@ -6,19 +6,19 @@
 class CTimer : public CRunnable
 {
 public:
-	CTimer();
-	virtual ~CTimer();
-	
-	void startTimer(int msec);
-	void stopTimer();
-	
-	virtual void onTimer();
-	
-	// for CRunnable
-	virtual void loopRun();
-	
+    CTimer();
+    virtual ~CTimer();
+
+    void startTimer(int msec);
+    void stopTimer();
+
+    virtual void onTimer();
+
+    // for CRunnable
+    virtual void loopRun();
+
 private:
-	int mPeriod; // ms
+    int mPeriod; // ms
 };
 
 #endif

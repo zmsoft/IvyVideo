@@ -50,16 +50,24 @@ void CVideoEncode::uninit()
 
 void CVideoEncode::onRawFrame(char *data, int size, RawFrameFormat format)
 {
-    return_if_fail(format.width == mEncodeParam.width && 
-        format.height == mEncodeParam.height);
+    LOGI("CVideoEncode.onRawFrame() begin, encode[%d, %d], input[%d, %d]",
+        mEncodeParam.width, mEncodeParam.height, format.width, format.height);
 
-    mMutex.on();
+    CAutoLock lock(mMutex);
+    if (mSample) {
+        if (mSample->getCapacity() < size) {
+            mSample->release();
+            mSample = NULL;
+        }
+    }
+
     if (mSample == NULL) {
-        mSample = CSampleAllocator::inst()->allocSample(0);
+        mSample = CSampleAllocator::inst()->allocSample(size);
+        return_if_fail(mSample != NULL);
+        mSample->addRef();
         mSample->setFormat(format.width, format.height, format.fmt);
     }
     mSample->setData(data, size);
-    mMutex.off();
 }
 
 // 

@@ -44,6 +44,7 @@ void CIvyClient::uninit()
 //
 bool CIvyClient::startSelfVideo()
 {
+    CAutoLock lock(mEncodeMutex);
     if (mVideoEncode == NULL) {
         mVideoEncode = new CVideoEncode(this);
     }
@@ -66,6 +67,7 @@ bool CIvyClient::startSelfVideo()
 
 bool CIvyClient::stopSelfVideo()
 {
+    CAutoLock lock(mEncodeMutex);
     return_val_if_fail(mVideoEncode != NULL, true);
     mVideoEncode->uninit();
 
@@ -74,6 +76,7 @@ bool CIvyClient::stopSelfVideo()
 
 void CIvyClient::onRawFrame(char *data, int len, RawFrameFormat format)
 {
+    CAutoLock lock(mEncodeMutex);
     if (mVideoEncode != NULL) {
         mVideoEncode->onRawFrame(data, len, format);
     }

@@ -52,7 +52,7 @@ JNIEXPORT jboolean JNICALL native_stopselfvideo(JNIEnv *env, jclass clazz)
 JNIEXPORT void JNICALL native_rawvideo(JNIEnv *env, jclass clazz, 
 	jbyteArray array, jint len, jint fmt, jint width, jint height, jint orientation)
 {
-    LOGI("native_rawvideo called, begin");
+    //LOGI("native_rawvideo called, begin");
     return_if_fail(len > 0);
 
     RawFrameFormat frameFormat;
@@ -65,7 +65,7 @@ JNIEXPORT void JNICALL native_rawvideo(JNIEnv *env, jclass clazz,
     return_if_fail(data != NULL);
     CIvyClient::inst()->onRawFrame((char *)data, len, frameFormat);
     env->ReleaseByteArrayElements(array, data, JNI_ABORT);
-    LOGI("native_rawvideo called, end");
+    //LOGI("native_rawvideo called, end");
 }
 
 
@@ -76,8 +76,8 @@ static JNINativeMethod gMethods[] = {
     { "native_hello", "()Ljava/lang/String;", (void*)native_hello },
     { "native_init", "()Z", (void*)native_init },
     { "native_uninit", "()V", (void*)native_uninit },
-    { "native_startselfvideo", "()V", (void*)native_startselfvideo },
-    { "native_stopselfvideo", "()V", (void*)native_stopselfvideo },
+    { "native_startselfvideo", "()Z", (void*)native_startselfvideo },
+    { "native_stopselfvideo", "()Z", (void*)native_stopselfvideo },
     { "native_rawvideo", "([BIIIII)V", (void*)native_rawvideo },
 };
 

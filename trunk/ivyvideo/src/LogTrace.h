@@ -4,7 +4,7 @@
 #ifdef ANDROID
 #include <android/log.h>
 
-#define IVYTAG "IvyMirage"
+#define IVYTAG "IvyMirageNative"
 
 #define LOGD(...) ((void)__android_log_print(ANDROID_LOG_DEBUG, IVYTAG, __VA_ARGS__))
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, IVYTAG, __VA_ARGS__))
