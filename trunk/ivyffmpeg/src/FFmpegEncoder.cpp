@@ -1,4 +1,5 @@
 #include "FFmpegEncoder.h"
+#include "LogTrace.h"
 
 // define the max audio packet size as 128 KB
 #define MAX_AUDIO_PACKET_SIZE (128 * 1024)
@@ -437,8 +438,10 @@ int FFmpegEncoder::writeAudioData(uint8_t *packetData, int packetSize)
 
 int FFmpegEncoder::open(const char *fileName)
 {
+    LOGI("FFmpegEncoder.open, begin!");
     if (this->opened)
     {
+        LOGW("FFmpegEncoder.open, try to reopen!");
         return -1;
     }
 
@@ -446,7 +449,8 @@ int FFmpegEncoder::open(const char *fileName)
     if (!this->hasOutput && this->videoParam.videoCodecName.empty() && 
             this->audioParam.audioCodecName.empty())
     {
-        return -2;
+        LOGE("FFmpegEncoder.open, no output or codec name");
+        return -1;
     }
 
     // initialize the output format
@@ -457,6 +461,7 @@ int FFmpegEncoder::open(const char *fileName)
         outputFormat = guess_format(NULL, fileName, NULL);
         if(!outputFormat)
         {
+            LOGE("FFmpegEncoder.open, failed to guess format!");
             return -1;
         }
     }
@@ -465,6 +470,7 @@ int FFmpegEncoder::open(const char *fileName)
     this->outputContext = av_alloc_format_context();
     if (!this->outputContext)
     {
+        LOGE("FFmpegEncoder.open, failed to alloc context!");
         return -2;
     }
 	
@@ -481,6 +487,7 @@ int FFmpegEncoder::open(const char *fileName)
         if ((!outputFormat || outputFormat->video_codec == CODEC_ID_NONE) && 
                 this->videoParam.videoCodecName.empty())
         {
+            LOGE("FFmpegEncoder.open, no outputformat or no video codec name!");
             return -1;
         }
 
@@ -499,6 +506,7 @@ int FFmpegEncoder::open(const char *fileName)
 
         if (!videoCodec)
         {
+            LOGE("FFmpegEncoder.open, find no video codec!");
             return -1;
         }
 
@@ -506,7 +514,8 @@ int FFmpegEncoder::open(const char *fileName)
         this->videoStream = av_new_stream(this->outputContext, 0);
         if (!this->videoStream)
         {
-            return -2;
+            LOGE("FFmpegEncoder.open, failed to new video stream!");
+            return -1;
         }
 
         // set the parameters for video codec context
@@ -550,6 +559,7 @@ int FFmpegEncoder::open(const char *fileName)
         // open the video codec
         if (avcodec_open(videoCodecContext, videoCodec) < 0)
         {
+            LOGE("FFmpegEncoder.open, failed to open video codec!");
             return -1;
         }
 
@@ -565,6 +575,7 @@ int FFmpegEncoder::open(const char *fileName)
             if (   this->videoFrame == NULL
                 || avpicture_alloc(this->videoFrame, videoCodecContext->pix_fmt, videoCodecContext->width, videoCodecContext->height) < 0 )
             {
+                LOGE("FFmpegEncoder.open, failed to alloc video frame!");
                 return -1;
             }
         }
@@ -576,6 +587,7 @@ int FFmpegEncoder::open(const char *fileName)
         // validate the audio codec
         if ((!outputFormat || outputFormat->audio_codec == CODEC_ID_NONE) && this->audioParam.audioCodecName.empty())
         {
+            LOGE("FFmpegEncoder.open, no outputformat or no audio codec name!");
             return -1;
         }
 
@@ -591,8 +603,10 @@ int FFmpegEncoder::open(const char *fileName)
             // otherwise, use the codec guessed from the filename
             audioCodec = avcodec_find_encoder(outputFormat->audio_codec);
         }
+
         if (!audioCodec)
         {
+            LOGE("FFmpegEncoder.open, invalid audio codec!");
             return -1;
         }
 
@@ -600,7 +614,8 @@ int FFmpegEncoder::open(const char *fileName)
         this->audioStream = av_new_stream(this->outputContext, 1);
         if (!this->audioStream)
         {
-            return -2;
+            LOGE("FFmpegEncoder.open, failed to new audio stream!");
+            return -1;
         }
 
         // set the parameters for audio codec context
@@ -614,6 +629,7 @@ int FFmpegEncoder::open(const char *fileName)
         // open the audio codec
         if (avcodec_open(audioCodecContext, audioCodec) < 0)
         {
+            LOGE("FFmpegEncoder.open, failed to open audio codec!");
             return -1;
         }
 
@@ -628,6 +644,7 @@ int FFmpegEncoder::open(const char *fileName)
     {
         if (av_set_parameters(this->outputContext, NULL) < 0)
         {
+            LOGE("FFmpegEncoder.open, failed to set parameters for file output!");
             return -1;
         }
     }
@@ -639,17 +656,22 @@ int FFmpegEncoder::open(const char *fileName)
     {
         if (url_fopen(&this->outputContext->pb, fileName, URL_WRONLY) < 0)
         {
+            LOGE("FFmpegEncoder.open, failed to url_fopen!");
             return -1;
         }
 
         // write the stream header, if any
         if (av_write_header(this->outputContext))
         {
+            LOGE("FFmpegEncoder.open, failed to write av header!");
             return -1;
         }
     }
 
     this->opened = true;
+    LOGI("FFmpegEncoder.open, end!");
+
+    return 0;
 }
 
 void FFmpegEncoder::close()

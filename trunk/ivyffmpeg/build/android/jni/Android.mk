@@ -6,6 +6,7 @@ TARGET_ARCH := arm
 include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES:= \
+    	LogTrace.cpp \
         FFmpegDecoder.cpp  \
         FFmpegEncoder.cpp  \
 	FFmpegVideoParam.cpp \
@@ -14,7 +15,7 @@ LOCAL_SRC_FILES:= \
 LOCAL_SHARED_LIBRARIES := 
 LOCAL_STATIC_LIBRARIES := 
 
-LOCAL_LDLIBS := -L../../libs/armeabi-v7a -lavutil -lavcodec -lavformat -lswscale
+LOCAL_LDLIBS := -llog -L../../libs/armeabi-v7a -lavutil -lavcodec -lavformat -lswscale
 
 LOCAL_MODULE := libivyffmpeg
 
@@ -22,6 +23,6 @@ LOCAL_C_INCLUDES := 		\
 	$(LOCAL_PATH)		\
 	$(EXT_PATH) 
 
-LOCAL_CFLAGS := 
+LOCAL_CFLAGS := -DANDROID
 
 include $(BUILD_SHARED_LIBRARY)
