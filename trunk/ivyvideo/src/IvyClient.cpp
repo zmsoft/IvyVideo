@@ -2,6 +2,17 @@
 #include "VideoEncode.h"
 #include "IvyUtil.h"
 
+CIvyClient *CIvyClient::mClient = NULL;
+
+CIvyClient *CIvyClient::inst() 
+{
+    if (mClient == NULL) {
+        mClient = new CIvyClient;
+    }
+
+    return mClient;
+}
+
 CIvyClient::CIvyClient()
 {
     mVideoEncode = NULL;
@@ -27,6 +38,10 @@ bool CIvyClient::init()
 void CIvyClient::uninit()
 {}
 
+
+//
+// for video encoder
+//
 bool CIvyClient::startSelfVideo()
 {
     if (mVideoEncode == NULL) {
@@ -57,6 +72,16 @@ bool CIvyClient::stopSelfVideo()
     return true;
 }
 
+void CIvyClient::onRawFrame(char *data, int len, RawFrameFormat format)
+{
+    if (mVideoEncode != NULL) {
+        mVideoEncode->onRawFrame(data, len, format);
+    }
+}
+
+//
+// for video decoder
+//
 bool CIvyClient::requestPeerVideo()
 {
     return false;

@@ -4,32 +4,56 @@
 #include "IvyCommon.h"
 #include "IvyVideo.h"
 #include "LogTrace.h"
+#include "IvyClient.h"
 
 #define JNI_VERSION 	JNI_VERSION_1_2
-#define JNIREG_CLASS 	"com/ivysee/mirage/Engine"
+#define JNIREG_CLASS 	"com/ivysee/mirage/IvyMirage"
 
+
+// for testing
 JNIEXPORT jstring JNICALL native_hello(JNIEnv *env, jclass clazz)
 {
     LOGI("hello in c native code.");
     return env->NewStringUTF("hello world returned.");
 }
 
-JNIEXPORT void JNICALL native_init(JNIEnv *env, jclass clazz)
+
+/**
+ * Interfaces for CIvyClient
+ */
+JNIEXPORT jboolean JNICALL native_init(JNIEnv *env, jclass clazz)
 {
     LOGI("native_init called, begin");
+    return CIvyClient::inst()->init();
 }
 
 JNIEXPORT void JNICALL native_uninit(JNIEnv *env, jclass clazz)
 {
     LOGI("native_uninit called, begin");
+    CIvyClient::inst()->uninit();
 }
 
+JNIEXPORT jboolean JNICALL native_startselfvideo(JNIEnv *env, jclass clazz)
+{
+    LOGI("native_startseflvideo called, begin");
+    return CIvyClient::inst()->startSelfVideo();
+}
+
+JNIEXPORT jboolean JNICALL native_stopselfvideo(JNIEnv *env, jclass clazz)
+{
+    LOGI("native_stopseflvideo called, begin");
+    return CIvyClient::inst()->stopSelfVideo();
+}
+
+
+/**
+ * Interface for IvyVideoEncode
+ */
 JNIEXPORT void JNICALL native_rawvideo(JNIEnv *env, jclass clazz, 
-	jint handle, jbyteArray array, jint len, jint fmt, jint width, jint height, jint orientation)
+	jbyteArray array, jint len, jint fmt, jint width, jint height, jint orientation)
 {
     LOGI("native_rawvideo called, begin");
-    IvyVideoEncode *pEnc = (IvyVideoEncode *)handle;
-    return_if_fail(pEnc != NULL && len > 0);
+    return_if_fail(len > 0);
 
     RawFrameFormat frameFormat;
     frameFormat.fmt = fmt;
@@ -39,17 +63,22 @@ JNIEXPORT void JNICALL native_rawvideo(JNIEnv *env, jclass clazz,
 
     jbyte *data = env->GetByteArrayElements(array, NULL);
     return_if_fail(data != NULL);
-    pEnc->onRawFrame((char *)data, len, frameFormat);
+    CIvyClient::inst()->onRawFrame((char *)data, len, frameFormat);
     env->ReleaseByteArrayElements(array, data, JNI_ABORT);
     LOGI("native_rawvideo called, end");
 }
+
 
 /**
  * Table of methods associated with a single class.
  */
 static JNINativeMethod gMethods[] = {
     { "native_hello", "()Ljava/lang/String;", (void*)native_hello },
-    { "native_rawvideo", "(I[BIIIII)V", (void*)native_rawvideo },
+    { "native_init", "()Z", (void*)native_init },
+    { "native_uninit", "()V", (void*)native_uninit },
+    { "native_startselfvideo", "()V", (void*)native_startselfvideo },
+    { "native_stopselfvideo", "()V", (void*)native_stopselfvideo },
+    { "native_rawvideo", "([BIIIII)V", (void*)native_rawvideo },
 };
 
 /*

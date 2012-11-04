@@ -8,18 +8,22 @@ class CIvyClient :
     public IvyVideoEncodeSink,
     public IvyVideoDecodeSink
 {
-public:
+protected:
     CIvyClient();
     ~CIvyClient();
+
+public:
+    static CIvyClient *inst();
 
     bool init();
     void uninit();
 
-    // for video encoder and send
+    // for video encoder
     bool startSelfVideo();
     bool stopSelfVideo();
+    void onRawFrame(char *data, int len, RawFrameFormat format);
 
-    // for video recv and decoder
+    // for video decoder
     bool requestPeerVideo();
     bool cancelPeerVideo();
 
@@ -32,6 +36,8 @@ public:
 private:
     IvyVideoEncode *mVideoEncode;
     IvyVideoDecode *mVideoDecode;
+
+    static CIvyClient *mClient;
 };
 
 #endif // _IVYCLIENT_H_
