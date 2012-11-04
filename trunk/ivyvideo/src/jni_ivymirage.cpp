@@ -33,6 +33,16 @@ JNIEXPORT void JNICALL native_uninit(JNIEnv *env, jclass clazz)
     CIvyClient::inst()->uninit();
 }
 
+JNIEXPORT void JNICALL native_setvideoencodeparams(JNIEnv *env, jclass clazz, jstring jstrcodec)
+{
+    LOGI("native_setvideoencodeparams called, begin");
+    const char *cstr = env->GetStringUTFChars(jstrcodec, 0);
+    LOGI("native_setvideoencodeparams called, codec: %s", cstr);
+    CIvyClient::inst()->setVideoEncodeParams(cstr);
+    env->ReleaseStringUTFChars(jstrcodec, cstr);
+    LOGI("native_setvideoencodeparams called, end");
+}
+
 JNIEXPORT jboolean JNICALL native_startselfvideo(JNIEnv *env, jclass clazz)
 {
     LOGI("native_startseflvideo called, begin");
@@ -78,6 +88,7 @@ static JNINativeMethod gMethods[] = {
     { "native_uninit", "()V", (void*)native_uninit },
     { "native_startselfvideo", "()Z", (void*)native_startselfvideo },
     { "native_stopselfvideo", "()Z", (void*)native_stopselfvideo },
+    { "native_setvideoencodeparams", "(Ljava/lang/String;)V", (void*)native_setvideoencodeparams },
     { "native_rawvideo", "([BIIIII)V", (void*)native_rawvideo },
 };
 

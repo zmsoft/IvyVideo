@@ -17,6 +17,7 @@ CIvyClient::CIvyClient()
 {
     mVideoEncode = NULL;
     mVideoDecode = NULL;
+    mVideoEncodecName = "h264";
 }
 
 CIvyClient::~CIvyClient()
@@ -60,7 +61,9 @@ bool CIvyClient::startSelfVideo()
     int bandwidth = 512*1024; // kb
     int fps = 25;
     return_val_if_fail(mVideoEncode->init(width, height, fmt, 
-                fps, bandwidth), false);
+                fps, bandwidth, mVideoEncodecName.c_str()), false);
+
+    ((CVideoEncode *)mVideoEncode)->startTimer(1000);
 
     return true;
 }
@@ -72,6 +75,13 @@ bool CIvyClient::stopSelfVideo()
     mVideoEncode->uninit();
 
     return true;
+}
+
+void CIvyClient::setVideoEncodeParams(const char *codec)
+{
+    if (codec != NULL) {
+        mVideoEncodecName = std::string(codec);
+    }
 }
 
 void CIvyClient::onRawFrame(char *data, int len, RawFrameFormat format)

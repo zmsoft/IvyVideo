@@ -18,7 +18,7 @@ public:
     virtual void loopRun();
 
 private:
-    int mPeriod; // ms
+    int mPeriod; // millisecond
 };
 
 #endif

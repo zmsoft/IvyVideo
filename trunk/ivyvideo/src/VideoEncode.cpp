@@ -13,19 +13,21 @@ CVideoEncode::~CVideoEncode()
     uninit();
 }
 
-bool CVideoEncode::init(int width, int height, int fmt, int fps, int bandwidth)
+bool CVideoEncode::init(int width, int height, int fmt, int fps, int bandwidth, const char *codec)
 {
-    LOGI("CVideoEncode.init() begin");
+    LOGI("CVideoEncode.init() begin, codec: %s", codec);
 
     int pixFmt;
     return_val_if_fail(getPixelFormat(fmt, pixFmt), false);
 
     // init with defalut parameters
-    mEncodeParam.setVideoParam(width, height, (PixelFormat)pixFmt, bandwidth, fps);
+    mEncodeParam.setVideoParam(width, height, (PixelFormat)pixFmt, bandwidth, fps, codec);
     mEncoder = new FFmpegEncoder(mEncodeParam);
 
     if(mEncoder->open() != 0) {
-        LOGE("FFmpegEncoder.open() failed");
+        LOGE("CVideoEncode.init(), failed to open FFmpegEncoder: %s", codec);
+        delete mEncoder;
+        mEncoder = NULL;
         return false;
     }
 
@@ -86,6 +88,7 @@ void CVideoEncode::onTimer()
     mMutex.off();
 
     if (pSample) {
+        LOGI("CVideoEncode::onTimer, get one frame and encode it");
         int size = mEncoder->encodeVideoFrame((const uint8_t *)pSample->getDataPtr());
         if (size > 0) {
             // maybe rtp pack

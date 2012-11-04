@@ -16,7 +16,7 @@ void CTimer::startTimer(int msec)
 {
     mPeriod = msec;
     if (mPeriod <= 0) {
-        mPeriod = 1000;
+        mPeriod = 1000; //millisecond
     }
     startRun();
 }
@@ -31,7 +31,7 @@ void CTimer::loopRun()
 {
     do{
         this->onTimer();
-        usleep(mPeriod);
+        usleep(mPeriod * 1000);
     }while(isRunning());
 }
 

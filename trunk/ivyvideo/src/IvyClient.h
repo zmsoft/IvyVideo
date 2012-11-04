@@ -22,6 +22,7 @@ public:
     // for video encoder
     bool startSelfVideo();
     bool stopSelfVideo();
+    void setVideoEncodeParams(const char *codec);
     void onRawFrame(char *data, int len, RawFrameFormat format);
 
     // for video decoder
@@ -37,6 +38,7 @@ public:
 private:
     IvyVideoEncode *mVideoEncode;
     IvyVideoDecode *mVideoDecode;
+    std::string          mVideoEncodecName;
 
     CMutex mEncodeMutex;
     CMutex mDecodeMutex;

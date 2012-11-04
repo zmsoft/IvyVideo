@@ -19,7 +19,7 @@ public:
     CVideoEncode(IvyVideoEncodeSink *sink);
     virtual ~CVideoEncode();
 
-    virtual bool init(int width, int height, int fmt, int fps, int bandwidth);
+    virtual bool init(int width, int height, int fmt, int fps, int bandwidth, const char *codec);
     virtual void uninit();
     virtual void onRawFrame(char *data, int size, RawFrameFormat format);
 
