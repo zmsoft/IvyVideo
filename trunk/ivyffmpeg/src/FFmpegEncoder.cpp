@@ -559,7 +559,7 @@ int FFmpegEncoder::open(const char *fileName)
         // open the video codec
         if (avcodec_open(videoCodecContext, videoCodec) < 0)
         {
-            LOGE("FFmpegEncoder.open, failed to open video codec!");
+            LOGE("FFmpegEncoder.open, find but failed to open video codec!");
             return -1;
         }
 

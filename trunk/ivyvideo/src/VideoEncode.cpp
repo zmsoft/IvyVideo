@@ -52,8 +52,8 @@ void CVideoEncode::uninit()
 
 void CVideoEncode::onRawFrame(char *data, int size, RawFrameFormat format)
 {
-    LOGI("CVideoEncode.onRawFrame() begin, encode[%d, %d], input[%d, %d]",
-        mEncodeParam.width, mEncodeParam.height, format.width, format.height);
+    LOGI("CVideoEncode.onRawFrame() begin, encode[%d, %d], input[%d, %d], len[%d]",
+        mEncodeParam.width, mEncodeParam.height, format.width, format.height, size);
     return_if_fail(format.fmt == ANDROID_NV21);
 
     CAutoLock lock(mMutex);
@@ -71,7 +71,7 @@ void CVideoEncode::onRawFrame(char *data, int size, RawFrameFormat format)
     }
     
     return_if_fail(mSample->setDataSize(size));
-    NV21toI420(data, mSample->getDataPtr(), format.width, format.height, 8);
+    NV21toI420(data, mSample->getDataPtr(), format.width, format.height, 1);
     format.fmt = CSP_I420;
     mSample->setFormat(format.width, format.height, format.fmt);
 }

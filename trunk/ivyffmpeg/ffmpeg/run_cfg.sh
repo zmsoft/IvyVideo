@@ -1,3 +1,7 @@
+export NDK=/opt/android-ndk-r8b
+export SYSROOT=$NDK/platforms/android-8/arch-arm
+export PATH=$PATH:$NDK/toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86/bin
+
 ./configure \
 	--enable-gpl \
 	--enable-shared \
@@ -12,7 +16,8 @@
 	--enable-zlib \
 	--disable-bsfs --disable-devices --disable-outdevs --disable-indevs --disable-hwaccels \
 	--disable-encoders \
-	--enable-encoder=aac --enable-encoder=flv --enable-encoder=mpeg4 \
+        --enable-libx264 \
+	--enable-encoder=aac --enable-encoder=flv --enable-encoder=mpeg4 --enable-encoder=libx264 \
 	--disable-decoders \
 	--enable-decoder=aac --enable-decoder=flv --enable-decoder=h264 --enable-decoder=mpeg4 \
 	--disable-demuxers \
@@ -24,5 +29,11 @@
 	--disable-parsers \
 	--enable-parser=aac --enable-parser=h264 --enable-parser=mpeg4video \
 	--disable-filters \
-	--enable-filter=null
+	--enable-filter=null \
+        --extra-cflags=-I./libx264 \
+        --extra-ldflags=-L./build/android/obj/local/armeabi-v7a \
+        --arch=arm \
+        --host-cc=arm-linux-androideabi-gcc \
+        --sysroot=$SYSROOT \
+        --cross-prefix=arm-linux-androideabi-
 

@@ -45,22 +45,23 @@ void NV21toI420(const char *src, char *dst, int width, int height, int pixel)
         return;
     }
 
-    int YSize = width * height * pixel;
-    int UVSize = YSize / 2;
+    unsigned int YSize = width * height * pixel;
+    unsigned int UVSize = (YSize>>1);
 
     const char *pSrcY = src;
     const char *pSrcUV = src + YSize;
 
     char *pDstY = dst;
-    char *pDstUV = dst + YSize;
+    char *pDstU = dst + YSize;
+    char *pDstV = dst + YSize + (UVSize>>1);
     
     // copy Y
     memcpy(pDstY, pSrcY, YSize);
 
     // copy U and V
-    for (int k=0; k < UVSize; k+=2) {
-        pDstUV[k] = pSrcUV[k];
-        pDstUV[UVSize/2 + k] = pSrcUV[k+1];
+    for (int k=1; k < (UVSize>>1); k++) {
+        pDstV[k] = pSrcUV[k-1]; // copy V
+        pDstU[k] = pSrcUV[k];   // copy U
     }
 }
 
@@ -70,17 +71,19 @@ void YV12toI420(const char *src, char *dst, int width, int height, int pixel)
         return;
     }
 
-    int YSize = width * height * pixel / 8;
-    int UVSize = YSize / 2;
+    unsigned int YSize = width * height * pixel;
+    unsigned int UVSize = (YSize>>1);
 
     const char *pSrcY = src;
-    const char *pSrcUV = src + YSize;
+    const char *pSrcV = src + YSize;
+    const char *pSrcU = src + YSize + (UVSize>>1);
 
     char *pDstY = dst;
-    char *pDstUV = dst + YSize;
+    char *pDstU = dst + YSize;
+    char *pDstV = dst + YSize + (UVSize>>1);
     
     memcpy(pDstY, pSrcY, YSize);
-    memcpy(pDstY+YSize, pSrcY+YSize+UVSize/2, UVSize/2);
-    memcpy(pDstY+YSize+UVSize/2, pSrcY+YSize, UVSize/2);
+    memcpy(pDstU, pSrcU, (UVSize>>1));
+    memcpy(pDstV, pSrcV, (UVSize>>1));
 }
 

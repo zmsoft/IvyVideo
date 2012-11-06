@@ -12,15 +12,15 @@ LOCAL_SRC_FILES := $(FFFILES)
 
 LOCAL_C_INCLUDES :=		\
 	$(LOCAL_PATH)		\
-	$(LOCAL_PATH)/..
+	$(LOCAL_PATH)/..	\
+	$(LOCAL_PATH)/../libx264
 
-LOCAL_CFLAGS += $(FFCFLAGS) \
-		../../../libx264
+LOCAL_CFLAGS += $(FFCFLAGS)
 
 LOCAL_SHARED_LIBRARIES := 
 LOCAL_STATIC_LIBRARIES := $(FFLIBS)
 
-LOCAL_LDLIBS := -lm -L../obj/local/armeabi-v7a -lavutil -lx264
+LOCAL_LDLIBS := -llog -lm -L../obj/local/armeabi-v7a -lavutil -lx264
 
 LOCAL_MODULE := $(FFNAME)
 

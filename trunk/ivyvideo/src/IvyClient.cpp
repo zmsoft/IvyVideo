@@ -17,7 +17,7 @@ CIvyClient::CIvyClient()
 {
     mVideoEncode = NULL;
     mVideoDecode = NULL;
-    mVideoEncodecName = "h264";
+    mVideoEncodecName = "libx264";
     mVideoEncodeSink = this;
 }
 
