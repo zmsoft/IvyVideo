@@ -1,7 +1,20 @@
-if [ $# != 1 ]; then
+if [[ $# != 1 && $# != 2 ]]; then
     echo "usage: $0 module"
     exit 1
 fi
+
+ext=so
+if [ $# == 2 ]; then
+    if [ $2 == "static" ]; then
+        ext=a
+    elif [ $2 == "shared" ]; then
+        ext=so
+    else
+        echo "fail argument: $2, should be static or shared"
+        exit 1
+    fi
+fi
+
 
 mod=$1
 modlist="avutil avcodec avformat swscale postproc avfilter "
@@ -33,8 +46,13 @@ APP_ABI := armeabi-v7a
 APP_STL := stlport_static
 EOF
     cp Android-$m.mk Android.mk
+    if [ $ext == "a" ]; then
+        sed -i s'/BUILD_SHARED_LIBRARY/BUILD_STATIC_LIBRARY/' Android.mk
+    fi
     ndk-build 2>/tmp/err.log
-    cp -f $libpath/lib$app.so $dstpath/
+    if [ $ext == "so" ]; then
+        cp -f $libpath/lib$app.$ext $dstpath/
+    fi
 done
 
 exit 0
