@@ -17,7 +17,7 @@ fi
 
 
 mod=$1
-modlist="avutil avcodec avformat swscale postproc avfilter "
+modlist="x264 avutil avcodec avformat swscale postproc avfilter "
 libpath=../libs/armeabi-v7a
 dstpath=../../../../build/libs/armeabi-v7a
 
