@@ -11,11 +11,15 @@ public:
 
     char *getDataPtr();
     int getDataSize();
-    void setFormat(int width, int height, int format);
+
+    bool setDataPtr(char *data);
+    bool setDataSize(int size);
+
     bool setData(char *data, int size);
 
     int getCapacity();
 
+    void setFormat(int width, int height, int format);
 private:
     char *mBuffer;
     int  mBufSize; 

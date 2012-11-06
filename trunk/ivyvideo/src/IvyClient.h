@@ -24,6 +24,7 @@ public:
     bool stopSelfVideo();
     void setVideoEncodeParams(const char *codec);
     void onRawFrame(char *data, int len, RawFrameFormat format);
+    void setExternalVideoEncodeSink(IvyVideoEncodeSink *sink);
 
     // for video decoder
     bool requestPeerVideo();
@@ -38,7 +39,8 @@ public:
 private:
     IvyVideoEncode *mVideoEncode;
     IvyVideoDecode *mVideoDecode;
-    std::string          mVideoEncodecName;
+    std::string     mVideoEncodecName;
+    IvyVideoEncodeSink *mVideoEncodeSink;
 
     CMutex mEncodeMutex;
     CMutex mDecodeMutex;

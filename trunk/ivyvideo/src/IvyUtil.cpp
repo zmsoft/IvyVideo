@@ -39,3 +39,48 @@ bool getPixelFormat(int fmt, int &pixFmt)
     return true;
 }
 
+void NV21toI420(const char *src, char *dst, int width, int height, int pixel)
+{
+    if (!src || !dst) {
+        return;
+    }
+
+    int YSize = width * height * pixel;
+    int UVSize = YSize / 2;
+
+    const char *pSrcY = src;
+    const char *pSrcUV = src + YSize;
+
+    char *pDstY = dst;
+    char *pDstUV = dst + YSize;
+    
+    // copy Y
+    memcpy(pDstY, pSrcY, YSize);
+
+    // copy U and V
+    for (int k=0; k < UVSize; k+=2) {
+        pDstUV[k] = pSrcUV[k];
+        pDstUV[UVSize/2 + k] = pSrcUV[k+1];
+    }
+}
+
+void YV12toI420(const char *src, char *dst, int width, int height, int pixel)
+{
+    if (!src || !dst) {
+        return;
+    }
+
+    int YSize = width * height * pixel / 8;
+    int UVSize = YSize / 2;
+
+    const char *pSrcY = src;
+    const char *pSrcUV = src + YSize;
+
+    char *pDstY = dst;
+    char *pDstUV = dst + YSize;
+    
+    memcpy(pDstY, pSrcY, YSize);
+    memcpy(pDstY+YSize, pSrcY+YSize+UVSize/2, UVSize/2);
+    memcpy(pDstY+YSize+UVSize/2, pSrcY+YSize, UVSize/2);
+}
+

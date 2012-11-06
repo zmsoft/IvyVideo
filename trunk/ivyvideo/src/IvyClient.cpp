@@ -18,6 +18,7 @@ CIvyClient::CIvyClient()
     mVideoEncode = NULL;
     mVideoDecode = NULL;
     mVideoEncodecName = "h264";
+    mVideoEncodeSink = this;
 }
 
 CIvyClient::~CIvyClient()
@@ -60,9 +61,8 @@ bool CIvyClient::startSelfVideo()
     int fmt = CSP_I420;
     int bandwidth = 512*1024; // kb
     int fps = 25;
-    return_val_if_fail(mVideoEncode->init(width, height, fmt, 
-                fps, bandwidth, mVideoEncodecName.c_str()), false);
-
+    returnf_if_fail(mVideoEncode->init(width, height, fmt, 
+                fps, bandwidth, mVideoEncodecName.c_str()));
     ((CVideoEncode *)mVideoEncode)->startTimer(1000);
 
     return true;
@@ -71,7 +71,7 @@ bool CIvyClient::startSelfVideo()
 bool CIvyClient::stopSelfVideo()
 {
     CAutoLock lock(mEncodeMutex);
-    return_val_if_fail(mVideoEncode != NULL, true);
+    returnv_if_fail(mVideoEncode != NULL, true);
     mVideoEncode->uninit();
 
     return true;
@@ -79,17 +79,21 @@ bool CIvyClient::stopSelfVideo()
 
 void CIvyClient::setVideoEncodeParams(const char *codec)
 {
-    if (codec != NULL) {
-        mVideoEncodecName = std::string(codec);
-    }
+    return_if_fail (codec != NULL);
+    mVideoEncodecName = std::string(codec);
+}
+
+void CIvyClient::setExternalVideoEncodeSink(IvyVideoEncodeSink *sink)
+{
+    return_if_fail(sink != NULL);
+    mVideoEncodeSink = sink;
 }
 
 void CIvyClient::onRawFrame(char *data, int len, RawFrameFormat format)
 {
     CAutoLock lock(mEncodeMutex);
-    if (mVideoEncode != NULL) {
-        mVideoEncode->onRawFrame(data, len, format);
-    }
+    return_if_fail (mVideoEncode != NULL);
+    mVideoEncode->onRawFrame(data, len, format);
 }
 
 //
