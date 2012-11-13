@@ -1,9 +1,9 @@
 ROOT_PATH := $(call my-dir)/../../..
 EXT_PATH := $(ROOT_PATH)/ffmpeg
 LOCAL_PATH := $(ROOT_PATH)/src
-TARGET_ARCH := arm
-
 include $(CLEAR_VARS)
+
+LOCAL_ARM_MODE := arm
 
 LOCAL_SRC_FILES:= \
     	LogTrace.cpp \

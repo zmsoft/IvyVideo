@@ -34,5 +34,11 @@ public:
     virtual void onDecoded(char *data, int size, int format) = 0;
 };
 
+class IvyMediaSessionSink
+{
+public:
+    virtual void onNotifyMessage(const char *data, int size, int type) = 0;
+};
+
 #endif
 

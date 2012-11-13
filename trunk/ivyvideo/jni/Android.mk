@@ -17,6 +17,8 @@ EXT_PATH := ../..
 
 include $(CLEAR_VARS)
 
+LOCAL_ARM_MODE := arm
+
 LOCAL_MODULE    := ivyvideo
 LOCAL_SRC_FILES := ../src/jni_ivymirage.cpp \
 	../src/Runnable.cpp  \
@@ -25,6 +27,7 @@ LOCAL_SRC_FILES := ../src/jni_ivymirage.cpp \
 	../src/LogTrace.cpp  \
 	../src/IvyClient.cpp \
 	../src/IvyUtil.cpp \
+	../src/MediaSession.cpp \
 	../src/VideoDecode.cpp  \
 	../src/VideoEncode.cpp
 
@@ -33,11 +36,13 @@ LOCAL_SHARED_LIBRARIES :=
 
 LOCAL_LDLIBS := -llog
 LOCAL_LDLIBS += -L$(EXT_PATH)/ivyffmpeg/build/libs/armeabi-v7a -livyffmpeg
+LOCAL_LDLIBS += -L$(EXT_PATH)/sgsclient -lsgsclient
 
 LOCAL_C_INCLUDES := 		\
 	$(LOCAL_PATH)		\
 	$(EXT_PATH)/ivyffmpeg/ffmpeg 		\
-	$(EXT_PATH)/ivyffmpeg/src 		
+	$(EXT_PATH)/ivyffmpeg/src 		\
+	$(EXT_PATH)/sgsclient
 
 LOCAL_CFLAGS := -DANDROID
 
