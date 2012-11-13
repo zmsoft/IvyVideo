@@ -1,0 +1,67 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.6	//
+DEFAULT_HOST	smokeTestClient.c	27;"	d	file:
+DEFAULT_PORT	smokeTestClient.c	28;"	d	file:
+EXES	nmake.mak	/^EXES = \\$/;"	m
+INCS	nmake.mak	/^INCS = $(INCS) \/I$(TOPDIR)$/;"	m
+LDFLAGS	nmake.mak	/^LDFLAGS = \/LIBPATH:$(TOPDIR) $(LDFLAGS)$/;"	m
+LIBS	nmake.mak	/^LIBS = sgsclient.lib $(LIBS)$/;"	m
+TOPDIR	nmake.mak	/^TOPDIR=..$/;"	m
+_TESTCALLBACKS_H	testCallbacks.h	9;"	d
+byteTest	message_test.c	/^} byteTest;$/;"	t	typeref:struct:bytetest	file:
+bytetest	message_test.c	/^typedef struct bytetest{$/;"	s	file:
+channelJoinFail	testCallbacks.h	/^        loginFail, channelJoinFail, channelLeaveFail,$/;"	v
+channelLeaveFail	testCallbacks.h	/^        loginFail, channelJoinFail, channelLeaveFail,$/;"	v
+channelMessageFail	testCallbacks.h	/^        channelMessageFail, sessionMessageFail;$/;"	v
+channel_joined_cb	testCallbacks.c	/^void channel_joined_cb(sgs_connection *conn,$/;"	f
+channel_left_cb	testCallbacks.c	/^void channel_left_cb(sgs_connection *conn,$/;"	f
+channel_recv_msg_cb	testCallbacks.c	/^void channel_recv_msg_cb(sgs_connection *conn,$/;"	f
+compare_ints	map_test.c	/^static int compare_ints(const void* a, const void* b)$/;"	f	file:
+contents	message_test.c	/^    uint8_t *contents;$/;"	m	struct:bytetest	file:
+disconnected_cb	testCallbacks.c	/^void disconnected_cb(sgs_connection *conn) {$/;"	f
+g_hostname	smokeTestClient.c	/^static char* g_hostname = DEFAULT_HOST;$/;"	v	file:
+g_master_exceptset	testCallbacks.h	/^static fd_set g_master_readset, g_master_writeset, g_master_exceptset;$/;"	v
+g_master_readset	testCallbacks.h	/^static fd_set g_master_readset, g_master_writeset, g_master_exceptset;$/;"	v
+g_master_writeset	testCallbacks.h	/^static fd_set g_master_readset, g_master_writeset, g_master_exceptset;$/;"	v
+g_maxfd	testCallbacks.h	/^static int g_maxfd;$/;"	v
+g_port	smokeTestClient.c	/^static int g_port = DEFAULT_PORT;$/;"	v	file:
+generateIds	id_test.c	/^void generateIds(sgs_id **testIds){$/;"	f
+generateIds	message_test.c	/^void generateIds(sgs_id **testIds){$/;"	f
+generateTestBytes	message_test.c	/^void generateTestBytes(byteTest **toTest){$/;"	f
+getCommandArgs	smokeTestClient.c	/^void getCommandArgs(int count, char *args[]){$/;"	f
+inputReceived	testCallbacks.h	/^int inputReceived;$/;"	v
+loadContext	smokeTestClient.c	/^void loadContext(sgs_context *context)$/;"	f
+logged_in_cb	testCallbacks.c	/^void logged_in_cb(sgs_connection *conn,$/;"	f
+loginDisconnectFail	testCallbacks.h	/^int loginFailFail, loginDisconnectFail,$/;"	v
+loginFail	testCallbacks.h	/^        loginFail, channelJoinFail, channelLeaveFail,$/;"	v
+loginFailFail	testCallbacks.h	/^int loginFailFail, loginDisconnectFail,$/;"	v
+loginName	testCallbacks.h	/^static char  loginName[] = "smokeTest";$/;"	v
+login_failed_cb	testCallbacks.c	/^void login_failed_cb(sgs_connection *conn, const uint8_t *msg, size_t msglen) {$/;"	f
+main	buffer_test.c	/^int main(int argc, char *argv[]) {$/;"	f
+main	id_test.c	/^int main(int argc, char *argv[]) {$/;"	f
+main	map_test.c	/^int main(int argc, char *argv[]) {$/;"	f
+main	message_test.c	/^int main(int argc, char *argv[]) {$/;"	f
+main	smokeTestClient.c	/^int main(int argc, char** argv) {$/;"	f
+messageBuffer	testCallbacks.c	/^static uint8_t messageBuffer[256] ;$/;"	v	file:
+printArr	buffer_test.c	/^void printArr(const char *prefix, const uint8_t *buf, size_t len) {$/;"	f
+printMsg	message_test.c	/^static void printMsg(const sgs_message *pmsg) {$/;"	f	file:
+printResults	smokeTestClient.c	/^int printResults(){$/;"	f
+printStats	buffer_test.c	/^void printStats(const sgs_buffer *buf) {$/;"	f
+print_get	map_test.c	/^static int print_get(int key, const void* value) {$/;"	f	file:
+reconnected_cb	testCallbacks.c	/^void reconnected_cb(sgs_connection *conn) {$/;"	f
+recv_msg_cb	testCallbacks.c	/^void recv_msg_cb(sgs_connection *conn, const uint8_t *msg, size_t msglen) {$/;"	f
+register_fd_cb	testCallbacks.c	/^void register_fd_cb(sgs_connection *conn, int fd, short events) {$/;"	f
+sessionMessageFail	testCallbacks.h	/^        channelMessageFail, sessionMessageFail;$/;"	v
+size	message_test.c	/^    int size;$/;"	m	struct:bytetest	file:
+testBytes	message_test.c	/^int testBytes(sgs_message *pmsg, int numTests, int silent){$/;"	f
+testIds	message_test.c	/^int testIds(sgs_message *pmsg, int numTests, int silent){$/;"	f
+testLogin	smokeTestClient.c	/^int testLogin(sgs_connection *connection)$/;"	f
+testStrings	message_test.c	/^int testStrings(sgs_message *pmsg, int numTests, int silent) {$/;"	f
+testUint16	message_test.c	/^int testUint16(sgs_message *pmsg, int numTests, int silent){$/;"	f
+testUint32	message_test.c	/^int testUint32(sgs_message *pmsg, int numTests, int silent){$/;"	f
+unregister_fd_cb	testCallbacks.c	/^void unregister_fd_cb(sgs_connection *conn, int fd, short events) {$/;"	f
+waitForInput	smokeTestClient.c	/^void waitForInput(sgs_connection* connection)$/;"	f
