@@ -78,8 +78,7 @@ void loadContext(sgs_context *context)
 
 int testLogin(sgs_connection *connection)
 {
-    //sgs_connection_login(connection, "kickme", "password1");
-    sgs_connection_login(connection, "admin", "passwd");
+    sgs_connection_login(connection, "kickme", "password1");
     waitForInput(connection);
     if (loginFailFail == 1){
         printf("Log in failure test failed\n");
