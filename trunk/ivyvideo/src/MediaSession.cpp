@@ -7,7 +7,6 @@ CMediaSession::CMediaSession(IvyMediaSessionSink *sink) : mSink(sink)
 CMediaSession::~CMediaSession()
 {
     uninit();
-    mSink = NULL;
 }
 
 bool CMediaSession::init()
@@ -16,6 +15,35 @@ bool CMediaSession::init()
         return false;
     }
 
+    if (!initSGSClient()) {
+        uninit();
+    }
+}
+
+void CMediaSession::uninit()
+{
+    mSink = NULL;
+    uninitSGSClient();
+}
+
+int CMediaSession::joinSession()
+{
+    return 0;
+}
+
+void CMediaSession::leaveSession()
+{}
+
+void CMediaSession::sendMessage()
+{}
+
+
+/**
+ * Process for sgs client
+ */
+
+bool CMediaSession::initSGSClient()
+{
     mContext = sgs_ctx_create(mHost.c_str(), mPort, register_fd_cb, unregister_fd_cb);
     if (!mContext) {
         return false;
@@ -43,7 +71,7 @@ bool CMediaSession::init()
     return true;
 }
 
-void CMediaSession::uninit()
+bool CMediaSession::uninitSGSClient()
 {
     if (mConnection) {
         sgs_connection_destroy(mConnection);
@@ -55,17 +83,6 @@ void CMediaSession::uninit()
         mContext = NULL;
     }
 }
-
-int CMediaSession::joinSession()
-{
-    return 0;
-}
-
-void CMediaSession::leaveSession()
-{}
-
-void CMediaSession::sendMessage()
-{}
 
 void CMediaSession::channel_joined_cb(sgs_connection *conn, sgs_channel *channel)
 {}

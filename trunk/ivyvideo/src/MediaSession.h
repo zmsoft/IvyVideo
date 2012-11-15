@@ -27,6 +27,8 @@ public:
     void sendMessage();
 
 protected:
+    bool initSGSClient();
+    bool uninitSGSClient();
     static void channel_joined_cb(sgs_connection *conn, sgs_channel *channel);
     static void channel_left_cb(sgs_connection *conn, sgs_channel *channel);
     static void channel_recv_msg_cb(sgs_connection *conn, sgs_channel *channel, const uint8_t *msg, size_t msglen);
@@ -50,6 +52,7 @@ private:
     sgs_context *mContext;
     sgs_connection *mConnection;
     sgs_connection *mSession;
+    sgs_channel *mChannel;
 
     fd_set mReadSet;
     fd_set mWriteSet;
