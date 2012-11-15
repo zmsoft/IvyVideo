@@ -51,6 +51,9 @@ struct sgs_context_impl {
     /** Hostname and port number (of server) to connect to: */
     char *hostname;
     int port;
+
+    /** Store priv data */
+    void *priv;
   
     /** function pointers to callbacks: */
     void (*reg_fd_cb)(sgs_connection*, sgs_socket_t, short);
