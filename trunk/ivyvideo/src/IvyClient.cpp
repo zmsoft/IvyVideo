@@ -63,7 +63,7 @@ bool CIvyClient::startSelfVideo()
     int fps = 25;
     returnf_if_fail(mVideoEncode->init(width, height, fmt, 
                 fps, bandwidth, mVideoEncodecName.c_str()));
-    ((CVideoEncode *)mVideoEncode)->startTimer(1000);
+    ((CVideoEncode *)mVideoEncode)->startTimer(100);
 
     return true;
 }

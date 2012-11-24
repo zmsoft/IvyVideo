@@ -2,6 +2,71 @@
 #include "IvyUtil.h"
 #include "LogTrace.h"
 
+#define _TEST_ENCODE
+
+#ifdef _TEST_ENCODE
+#ifdef ANDROID
+#define FRAME_PATH "/sdcard"
+#else
+#define FRAME_PATH "/tmp"
+#endif
+#endif
+
+
+static void write_raw_to_file(char *data, int size)
+{
+#ifdef _TEST_ENCODE
+    if (size <= 0 || !data) {
+        return;
+    }
+
+    static int once = 0;
+    if (once > 0) {
+        once --;
+
+        static FILE *fpraw = NULL;
+        if (fpraw == NULL) {
+            fpraw = fopen(FRAME_PATH"/video_i420.yuv", "wb");
+        }
+        if (fpraw != NULL) {
+            fwrite(data, 1, size, fpraw);
+            fflush(fpraw);
+            if (once <=0 ) {
+                fclose(fpraw);
+                fpraw = NULL;
+            }
+        }
+    }
+#endif
+}
+
+static void write_avc_to_file(char *data, int size)
+{
+#ifdef _TEST_ENCODE
+    if (size <= 0 || !data) {
+        return;
+    }
+
+    static int once = 190;
+    if (once > 0) {
+        once --;
+
+        static FILE *fpavc = NULL;
+        if (fpavc == NULL) {
+            fpavc = fopen(FRAME_PATH"/video_avc.264", "wb");
+        }
+        if (fpavc != NULL) {
+            fwrite(data, 1, size, fpavc);
+            fflush(fpavc);
+            if (once <= 0) {
+                fclose(fpavc);
+                fpavc = NULL;
+            }
+        }
+    }
+#endif
+}
+
 CVideoEncode::CVideoEncode(IvyVideoEncodeSink *sink) : mEncodeSink(sink)
 {
     mSample = NULL;
@@ -15,7 +80,8 @@ CVideoEncode::~CVideoEncode()
 
 bool CVideoEncode::init(int width, int height, int fmt, int fps, int bandwidth, const char *codec)
 {
-    LOGI("CVideoEncode.init() begin, codec: %s", codec);
+    LOGI("CVideoEncode.init() begin, codec: %s, w: %d, h: %d, fmt: %d, fps: %d", 
+            codec, width, height, fmt, fps);
 
     int pixFmt;
     returnf_if_fail(getPixelFormat(fmt, pixFmt));
@@ -72,6 +138,7 @@ void CVideoEncode::onRawFrame(char *data, int size, RawFrameFormat format)
     
     return_if_fail(mSample->setDataSize(size));
     NV21toI420(data, mSample->getDataPtr(), format.width, format.height, 1);
+    write_raw_to_file(mSample->getDataPtr(), mSample->getDataSize());
     format.fmt = CSP_I420;
     mSample->setFormat(format.width, format.height, format.fmt);
 }
@@ -93,10 +160,12 @@ void CVideoEncode::onTimer()
 
     return_if_fail(pSample != NULL);
 
-    LOGI("CVideoEncode::onTimer, get one frame and encode it");
+    LOGI("CVideoEncode::onTimer, get one frame and encode, len = %d", pSample->getDataSize());
     int size = mEncoder->encodeVideoFrame((const uint8_t *)pSample->getDataPtr());
+    LOGI("CVideoEncode::onTimer, encoded frame len = %d", size);
     if (size > 0) {
         // maybe rtp pack
+        write_avc_to_file((char *)mEncoder->getVideoEncodedBuffer(), size);
         if (mEncodeSink) {
             mEncodeSink->onPacked((char *)mEncoder->getVideoEncodedBuffer(), size, PT_RAW);
         }

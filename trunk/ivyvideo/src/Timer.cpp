@@ -29,9 +29,10 @@ void CTimer::stopTimer()
 // for CRunnable
 void CTimer::loopRun()
 {
+    int usec = mPeriod * 1000;
     do{
         this->onTimer();
-        usleep(mPeriod * 1000);
+        usleep(usec);
     }while(isRunning());
 }
 

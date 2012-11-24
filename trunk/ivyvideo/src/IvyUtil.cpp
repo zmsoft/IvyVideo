@@ -48,9 +48,11 @@ void NV21toI420(const char *src, char *dst, int width, int height, int pixel)
     unsigned int YSize = width * height * pixel;
     unsigned int UVSize = (YSize>>1);
 
+    // NV21: Y..Y + VUV...U
     const char *pSrcY = src;
     const char *pSrcUV = src + YSize;
 
+    // I420: Y..Y + U.U + V.V
     char *pDstY = dst;
     char *pDstU = dst + YSize;
     char *pDstV = dst + YSize + (UVSize>>1);
@@ -59,9 +61,9 @@ void NV21toI420(const char *src, char *dst, int width, int height, int pixel)
     memcpy(pDstY, pSrcY, YSize);
 
     // copy U and V
-    for (int k=1; k < (UVSize>>1); k++) {
-        pDstV[k] = pSrcUV[k-1]; // copy V
-        pDstU[k] = pSrcUV[k];   // copy U
+    for (int k=0; k < (UVSize>>1); k++) {
+        pDstV[k] = pSrcUV[k*2];     // copy V
+        pDstU[k] = pSrcUV[k*2+1];   // copy U
     }
 }
 
