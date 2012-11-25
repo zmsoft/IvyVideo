@@ -207,9 +207,9 @@ int FFmpegEncoder::encodeVideoData(AVPicture *picture, FFmpegVideoParam &picPara
     }
 
     // convert the pixel format if needed
-    if (picParam.pixelFormat != videoCodecContext->pix_fmt || 
-            picParam.width != videoCodecContext->width || 
-            picParam.height != videoCodecContext->height)
+    if (picParam.pixelFormat != videoCodecContext->pix_fmt)
+            //|| picParam.width != videoCodecContext->width
+            //|| picParam.height != videoCodecContext->height)
     {
         if (this->convertPixFmt(picture, this->videoFrame, &picParam, videoCodecContext) != 0)
         {
@@ -631,6 +631,7 @@ int FFmpegEncoder::open(const char *fileName)
         this->videoBuffer     = (uint8_t*)(av_malloc(this->videoBufferSize));
 
         // allocate the temporal video frame buffer for pixel format conversion if needed
+        // FIXME: always allocate it when format or size is different
         if (this->videoParam.pixelFormat != videoCodecContext->pix_fmt)
         {
             this->videoFrame = (AVPicture *)av_malloc(sizeof(AVPicture));
