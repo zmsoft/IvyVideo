@@ -110,10 +110,11 @@ bool CropYUVFrame(const char *src, unsigned int src_w, unsigned int src_h, int f
         return true;
     }
 
-    unsigned int crop_x = (src_w - dst_w)>>1;
-    unsigned int crop_y = (src_h - dst_h)>>1;
+    unsigned int crop_x = (src_w - dst_w);
+    unsigned int crop_y = (src_h - dst_h);
 
-    if (format == CSP_I420) {
+    if (format == CSP_I420) 
+    {
         // for src
         unsigned int src_ysize = src_w * src_h;
         unsigned int src_usize = (src_ysize>>2);

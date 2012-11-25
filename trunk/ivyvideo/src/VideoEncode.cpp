@@ -20,7 +20,7 @@ static void write_raw_to_file(char *data, int size)
         return;
     }
 
-    static int once = 0;
+    static int once = 23;
     if (once > 0) {
         once --;
 
@@ -139,6 +139,7 @@ void CVideoEncode::onRawFrame(char *data, int size, RawFrameFormat &inFmt)
         LOGE("CVideoEncode.onRawFrame(), failed to CropYUVFrame");
         return;
     }
+    write_raw_to_file(pSample->getDataPtr(), pSample->getDataSize());
 
     CAutoLock lock(mMutex);
     if (mSample) {
@@ -158,7 +159,6 @@ void CVideoEncode::onRawFrame(char *data, int size, RawFrameFormat &inFmt)
     return_if_fail(mSample->setDataSize(frameSize));
     return_if_fail(NV21toI420(pSample->getDataPtr(), mSample->getDataPtr(), mSample->mWidth, mSample->mHeight));
     pSample->release();
-    write_raw_to_file(mSample->getDataPtr(), mSample->getDataSize());
 }
 
 // 
@@ -187,7 +187,7 @@ void CVideoEncode::onTimer()
     LOGI("CVideoEncode::onTimer, encoded frame len = %d", size);
     if (size > 0) {
         // maybe rtp pack
-        write_avc_to_file((char *)mEncoder->getVideoEncodedBuffer(), size);
+        //write_avc_to_file((char *)mEncoder->getVideoEncodedBuffer(), size);
         if (mEncodeSink) {
             mEncodeSink->onPacked((char *)mEncoder->getVideoEncodedBuffer(), size, PT_RAW);
         }

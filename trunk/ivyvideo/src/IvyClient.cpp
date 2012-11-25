@@ -53,10 +53,9 @@ bool CIvyClient::startSelfVideo()
 
     //TODO: query capture capability and host performance to
     // determine the parameters of encoder: fps, resolution, cpu
-    int size = SP_LOW_SIZE;
     int width = 0;
     int height = 0;
-    getSizeDetail(size, width, height);
+    getSizeDetail(SP_NORMAL_SIZE, width, height);
 
     int fmt = CSP_I420;
     int bandwidth = 512*1024; // kb
