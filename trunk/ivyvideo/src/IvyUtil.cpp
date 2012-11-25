@@ -39,13 +39,13 @@ bool getPixelFormat(int fmt, int &pixFmt)
     return true;
 }
 
-bool NV21toI420(const char *src, char *dst, int linesize, int height)
+bool NV21toI420(const char *src, char *dst, int width, int height)
 {
     if (!src || !dst) {
         return false;
     }
 
-    unsigned int YSize = linesize * height;
+    unsigned int YSize = width * height;
     unsigned int UVSize = (YSize>>1);
 
     // NV21: Y..Y + VUV...U
@@ -69,13 +69,13 @@ bool NV21toI420(const char *src, char *dst, int linesize, int height)
     return true;
 }
 
-bool YV12toI420(const char *src, char *dst, int linesize, int height)
+bool YV12toI420(const char *src, char *dst, int width, int height)
 {
     if (!src || !dst) {
         return false;
     }
 
-    unsigned int YSize = linesize * height;
+    unsigned int YSize = width * height;
     unsigned int UVSize = (YSize>>1);
 
     const char *pSrcY = src;

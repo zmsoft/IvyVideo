@@ -137,7 +137,7 @@ void CVideoEncode::onRawFrame(char *data, int size, RawFrameFormat &format)
     }
     
     return_if_fail(mSample->setDataSize(size));
-    return_if_fail(NV21toI420(data, mSample->getDataPtr(), format.width*1, format.height));
+    return_if_fail(NV21toI420(data, mSample->getDataPtr(), format.width, format.height));
     write_raw_to_file(mSample->getDataPtr(), mSample->getDataSize());
 
     mSample->setFormat(format.width, format.height, CSP_I420);
