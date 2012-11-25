@@ -103,7 +103,11 @@ int FFmpegEncoder::encodeVideoFrame(const uint8_t *frameData, PixelFormat format
 
     // encode the image frame
     AVPicture picture;
-    avpicture_fill(&picture, (uint8_t *)frameData, inParam.pixelFormat, inParam.width, inParam.height);
+    if(avpicture_fill(&picture, (uint8_t *)frameData, inParam.pixelFormat, inParam.width, inParam.height) == -1) 
+    {
+        return -1;
+    }
+
     return this->encodeVideoData(&picture, inParam);
 }
 
@@ -213,6 +217,7 @@ int FFmpegEncoder::encodeVideoData(AVPicture *picture, FFmpegVideoParam &picPara
     {
         if (this->convertPixFmt(picture, this->videoFrame, &picParam, videoCodecContext) != 0)
         {
+            LOGE("FFmpegEncoder::encodeVideoData, convertPixFmt error");
             return -1;
         }
         // fill the frame
