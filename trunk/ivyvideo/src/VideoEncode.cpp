@@ -160,8 +160,13 @@ void CVideoEncode::onTimer()
 
     return_if_fail(pSample != NULL);
 
+    int pixFmt, width, height;
+    return_if_fail(getPixelFormat(pSample->getFormat(), pixFmt));
+    width = pSample->getWidth();
+    height = pSample->getHeight();
+
     LOGI("CVideoEncode::onTimer, get one frame and encode, len = %d", pSample->getDataSize());
-    int size = mEncoder->encodeVideoFrame((const uint8_t *)pSample->getDataPtr());
+    int size = mEncoder->encodeVideoFrame((const uint8_t *)pSample->getDataPtr(), (PixelFormat)pixFmt, width, height);
     LOGI("CVideoEncode::onTimer, encoded frame len = %d", size);
     if (size > 0) {
         // maybe rtp pack

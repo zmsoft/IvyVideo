@@ -185,6 +185,7 @@ public:
     /// @return A non-negative int representing the size of the encoded buffer.
     ///
     int encodeVideoFrame(const uint8_t *frameData);
+    int encodeVideoFrame(const uint8_t *frameData, PixelFormat format, int width, int height);
 
     ///
     /// @brief  Encode a specific video frame and write encoded data to the output file.
@@ -196,6 +197,7 @@ public:
     /// @return A non-negative int representing the size of the encoded buffer.
     ///
     int writeVideoFrame(const uint8_t *frameData);
+    int writeVideoFrame(const uint8_t *frameData, PixelFormat format, int width, int height);
 
     ///
     /// @brief  Encode one audio frame (just encode, won't write encoded data to output file).
@@ -261,7 +263,7 @@ private:
     ///
     /// @return A non-negative int represents the size of the encoded data
     ///
-    int encodeVideoData(AVPicture *picture);
+    int encodeVideoData(AVPicture *picture, FFmpegVideoParam &inParam);
 
     ///
     /// @brief  Write the encoded video frame packet data to the output

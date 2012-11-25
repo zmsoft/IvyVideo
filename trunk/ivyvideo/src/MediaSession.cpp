@@ -52,12 +52,11 @@ bool CMediaSession::initSGSClient()
 {
     LOGI("CMediaSession::initSGSClient(), begin");
 
-    mContext = sgs_ctx_create(mHost.c_str(), mPort, register_fd_cb, unregister_fd_cb);
+    mContext = sgs_ctx_create_ex(mHost.c_str(), mPort, (void *)this, register_fd_cb, unregister_fd_cb);
     if (!mContext) {
         LOGE("CMediaSession::initSGSClient(), failed to sgs_ctx_create");
         return false;
     }
-    mContext->priv = (void *)this;
 
     sgs_ctx_set_channel_joined_cb(mContext, channel_joined_cb);
     sgs_ctx_set_channel_left_cb(mContext, channel_left_cb);

@@ -75,6 +75,7 @@ sgs_context_impl *sgs_ctx_create_empty(const char* hostname, const int port){
 
     strncpy(ctx->hostname, hostname, name_len);
     ctx->port = port;
+    ctx->priv = NULL;
 
     /* initialize all callback functions to NULL */
     sgs_ctx_unset_all_cbs(ctx);
@@ -95,6 +96,16 @@ sgs_context_impl *sgs_ctx_create(const char *hostname, const int port,
     if (ctx != NULL){
         ctx->reg_fd_cb = reg_fd;
         ctx->unreg_fd_cb = unreg_fd;
+    }
+    return ctx;
+}
+
+sgs_context_impl *sgs_ctx_create_ex(const char *hostname, const int port, void *priv,
+        void (*reg_fd)(sgs_connection*, sgs_socket_t, short),
+        void (*unreg_fd)(sgs_connection*, sgs_socket_t, short)) {
+    sgs_context_impl *ctx = sgs_ctx_create(hostname, port, reg_fd, unreg_fd);
+    if (ctx != NULL) {
+        ctx->priv = priv;
     }
     return ctx;
 }

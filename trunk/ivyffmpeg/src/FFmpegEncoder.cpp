@@ -81,6 +81,32 @@ int FFmpegEncoder::getVideoFrameSize() const
     return avpicture_get_size(this->videoParam.pixelFormat, this->videoParam.width, this->videoParam.height);
 }
 
+int FFmpegEncoder::encodeVideoFrame(const uint8_t *frameData, PixelFormat format, int width, int height)
+{
+    if (!this->opened)
+    {
+        return -1;
+    }
+
+    if (!this->encodeVideo)
+    {
+        return -2;
+    }
+
+    if (this->hasOutput)
+    {
+        return -3;
+    }
+
+    // set input video param
+    FFmpegVideoParam inParam(width, height, format, 0, 0, "");
+
+    // encode the image frame
+    AVPicture picture;
+    avpicture_fill(&picture, (uint8_t *)frameData, inParam.pixelFormat, inParam.width, inParam.height);
+    return this->encodeVideoData(&picture, inParam);
+}
+
 int FFmpegEncoder::encodeVideoFrame(const uint8_t *frameData)
 {
     if (!this->opened)
@@ -101,7 +127,41 @@ int FFmpegEncoder::encodeVideoFrame(const uint8_t *frameData)
     // encode the image frame
     AVPicture picture;
     avpicture_fill(&picture, (uint8_t *)frameData, this->videoParam.pixelFormat, this->videoParam.width, this->videoParam.height);
-    return this->encodeVideoData(&picture);
+    return this->encodeVideoData(&picture, this->videoParam);
+}
+
+int FFmpegEncoder::writeVideoFrame(const uint8_t *frameData, PixelFormat format, int width, int height)
+{
+    if (!this->opened)
+    {
+        return -1;
+    }
+
+    if (!this->encodeVideo)
+    {
+        return -1;
+    }
+
+    if (!this->hasOutput)
+    {
+        return -1;
+    }
+
+    // set input video param
+    FFmpegVideoParam inParam(width, height, format, 0, 0, "");
+
+    // encode the image
+    AVPicture picture;
+    avpicture_fill(&picture, (uint8_t *)frameData, inParam.pixelFormat, inParam.width, inParam.height);
+    int encodedSize = this->encodeVideoData(&picture, inParam);
+
+    // output the encoded image data
+    if (encodedSize > 0)
+    {
+        this->writeVideoData(this->videoBuffer, encodedSize);
+    }
+	
+    return encodedSize;
 }
 
 int FFmpegEncoder::writeVideoFrame(const uint8_t *frameData)
@@ -124,7 +184,7 @@ int FFmpegEncoder::writeVideoFrame(const uint8_t *frameData)
     // encode the image
     AVPicture picture;
     avpicture_fill(&picture, (uint8_t *)frameData, this->videoParam.pixelFormat, this->videoParam.width, this->videoParam.height);
-    int encodedSize = this->encodeVideoData(&picture);
+    int encodedSize = this->encodeVideoData(&picture, this->videoParam);
 
     // output the encoded image data
     if (encodedSize > 0)
@@ -136,7 +196,7 @@ int FFmpegEncoder::writeVideoFrame(const uint8_t *frameData)
 }
 
 // private method 
-int FFmpegEncoder::encodeVideoData(AVPicture *picture)
+int FFmpegEncoder::encodeVideoData(AVPicture *picture, FFmpegVideoParam &picParam)
 {
     AVCodecContext *videoCodecContext = this->videoStream->codec;
 
@@ -147,9 +207,11 @@ int FFmpegEncoder::encodeVideoData(AVPicture *picture)
     }
 
     // convert the pixel format if needed
-    if (this->videoParam.pixelFormat != videoCodecContext->pix_fmt)
+    if (picParam.pixelFormat != videoCodecContext->pix_fmt || 
+            picParam.width != videoCodecContext->width || 
+            picParam.height != videoCodecContext->height)
     {
-        if (this->convertPixFmt(picture, this->videoFrame, &this->videoParam, videoCodecContext) != 0)
+        if (this->convertPixFmt(picture, this->videoFrame, &picParam, videoCodecContext) != 0)
         {
             return -1;
         }

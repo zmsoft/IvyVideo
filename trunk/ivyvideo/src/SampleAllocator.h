@@ -20,6 +20,11 @@ public:
     int getCapacity();
 
     void setFormat(int width, int height, int format);
+
+    int getWidth() { return mWidth; }
+    int getHeight() { return mHeight; }
+    int getFormat() { return mFormat; }
+
 private:
     char *mBuffer;
     int  mBufSize; 
