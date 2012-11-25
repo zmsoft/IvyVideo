@@ -116,7 +116,7 @@ void CVideoEncode::uninit()
     LOGI("CVideoEncode.uninit() end");
 }
 
-void CVideoEncode::onRawFrame(char *data, int size, RawFrameFormat format)
+void CVideoEncode::onRawFrame(char *data, int size, RawFrameFormat &format)
 {
     LOGI("CVideoEncode.onRawFrame() begin, encode[%d, %d], input[%d, %d], len[%d]",
         mEncodeParam.width, mEncodeParam.height, format.width, format.height, size);
@@ -137,10 +137,10 @@ void CVideoEncode::onRawFrame(char *data, int size, RawFrameFormat format)
     }
     
     return_if_fail(mSample->setDataSize(size));
-    NV21toI420(data, mSample->getDataPtr(), format.width, format.height, 1);
+    return_if_fail(NV21toI420(data, mSample->getDataPtr(), format.width*1, format.height));
     write_raw_to_file(mSample->getDataPtr(), mSample->getDataSize());
-    format.fmt = CSP_I420;
-    mSample->setFormat(format.width, format.height, format.fmt);
+
+    mSample->setFormat(format.width, format.height, CSP_I420);
 }
 
 // 

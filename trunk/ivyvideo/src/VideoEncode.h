@@ -19,9 +19,10 @@ public:
     CVideoEncode(IvyVideoEncodeSink *sink);
     virtual ~CVideoEncode();
 
+    // for IvyVideoEncode
     virtual bool init(int width, int height, int fmt, int fps, int bandwidth, const char *codec);
     virtual void uninit();
-    virtual void onRawFrame(char *data, int size, RawFrameFormat format);
+    virtual void onRawFrame(char *data, int size, RawFrameFormat &format);
 
 protected:
     // for CTimer

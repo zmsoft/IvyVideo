@@ -39,13 +39,13 @@ bool getPixelFormat(int fmt, int &pixFmt)
     return true;
 }
 
-void NV21toI420(const char *src, char *dst, int width, int height, int pixel)
+bool NV21toI420(const char *src, char *dst, int linesize, int height)
 {
     if (!src || !dst) {
-        return;
+        return false;
     }
 
-    unsigned int YSize = width * height * pixel;
+    unsigned int YSize = linesize * height;
     unsigned int UVSize = (YSize>>1);
 
     // NV21: Y..Y + VUV...U
@@ -65,15 +65,17 @@ void NV21toI420(const char *src, char *dst, int width, int height, int pixel)
         pDstV[k] = pSrcUV[k*2];     // copy V
         pDstU[k] = pSrcUV[k*2+1];   // copy U
     }
+
+    return true;
 }
 
-void YV12toI420(const char *src, char *dst, int width, int height, int pixel)
+bool YV12toI420(const char *src, char *dst, int linesize, int height)
 {
     if (!src || !dst) {
-        return;
+        return false;
     }
 
-    unsigned int YSize = width * height * pixel;
+    unsigned int YSize = linesize * height;
     unsigned int UVSize = (YSize>>1);
 
     const char *pSrcY = src;
@@ -87,5 +89,7 @@ void YV12toI420(const char *src, char *dst, int width, int height, int pixel)
     memcpy(pDstY, pSrcY, YSize);
     memcpy(pDstU, pSrcU, (UVSize>>1));
     memcpy(pDstV, pSrcV, (UVSize>>1));
+
+    return true;
 }
 

@@ -9,7 +9,7 @@ class IvyVideoEncode
 public:
     virtual bool init(int width, int height, int fmt, int fps, int bandwidth, const char *codec) = 0;
     virtual void uninit() = 0;
-    virtual void onRawFrame(char *data, int len, RawFrameFormat format) = 0;
+    virtual void onRawFrame(char *data, int len, RawFrameFormat &format) = 0;
 };
 
 class IvyVideoDecode
