@@ -116,31 +116,49 @@ void CVideoEncode::uninit()
     LOGI("CVideoEncode.uninit() end");
 }
 
-void CVideoEncode::onRawFrame(char *data, int size, RawFrameFormat &format)
+void CVideoEncode::onRawFrame(char *data, int size, RawFrameFormat &inFmt)
 {
     LOGI("CVideoEncode.onRawFrame() begin, encode[%d, %d], input[%d, %d], len[%d]",
-        mEncodeParam.width, mEncodeParam.height, format.width, format.height, size);
-    return_if_fail(format.fmt == ANDROID_NV21);
+        mEncodeParam.width, mEncodeParam.height, inFmt.width, inFmt.height, size);
+    return_if_fail(inFmt.fmt == ANDROID_NV21);
+
+    // crop frame
+    int frameWidth = mEncodeParam.width;
+    int frameHeight = mEncodeParam.height;
+    int frameSize = frameWidth * frameHeight * 3 / 2;
+
+    CSample *pSample = CSampleAllocator::inst()->allocSample(frameSize);
+    return_if_fail(pSample != NULL);
+    pSample->addRef();
+
+    pSample->setDataSize(frameSize);
+    bool bret = CropYUVFrame(data, inFmt.width, inFmt.height, CSP_NV21, 
+            pSample->getDataPtr(), frameWidth, frameHeight);
+    if (!bret) {
+        pSample->release();
+        LOGE("CVideoEncode.onRawFrame(), failed to CropYUVFrame");
+        return;
+    }
 
     CAutoLock lock(mMutex);
     if (mSample) {
-        if (mSample->getCapacity() < size) {
+        if (mSample->getCapacity() < frameSize) {
             mSample->release();
             mSample = NULL;
         }
     }
 
     if (mSample == NULL) {
-        mSample = CSampleAllocator::inst()->allocSample(size);
+        mSample = CSampleAllocator::inst()->allocSample(frameSize);
         return_if_fail(mSample != NULL);
         mSample->addRef();
     }
     
-    return_if_fail(mSample->setDataSize(size));
-    return_if_fail(NV21toI420(data, mSample->getDataPtr(), format.width, format.height));
+    mSample->setFormat(frameWidth, frameHeight, CSP_I420);
+    return_if_fail(mSample->setDataSize(frameSize));
+    return_if_fail(NV21toI420(pSample->getDataPtr(), mSample->getDataPtr(), mSample->mWidth, mSample->mHeight));
+    pSample->release();
     write_raw_to_file(mSample->getDataPtr(), mSample->getDataSize());
-
-    mSample->setFormat(format.width, format.height, CSP_I420);
 }
 
 // 
@@ -160,13 +178,12 @@ void CVideoEncode::onTimer()
 
     return_if_fail(pSample != NULL);
 
-    int pixFmt, width, height;
+    int pixFmt = -1;
     return_if_fail(getPixelFormat(pSample->getFormat(), pixFmt));
-    width = pSample->getWidth();
-    height = pSample->getHeight();
 
     LOGI("CVideoEncode::onTimer, get one frame and encode, len = %d", pSample->getDataSize());
-    int size = mEncoder->encodeVideoFrame((const uint8_t *)pSample->getDataPtr(), (PixelFormat)pixFmt, width, height);
+    int size = mEncoder->encodeVideoFrame((const uint8_t *)pSample->getDataPtr(), 
+            (PixelFormat)pixFmt, pSample->mWidth, pSample->mHeight);
     LOGI("CVideoEncode::onTimer, encoded frame len = %d", size);
     if (size > 0) {
         // maybe rtp pack

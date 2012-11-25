@@ -32,6 +32,7 @@ private:
     char *mData;
     int  mSize;
 
+public:
     // for video
     int mWidth;
     int mHeight;
