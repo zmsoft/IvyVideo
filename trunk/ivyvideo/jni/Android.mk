@@ -27,6 +27,7 @@ LOCAL_SRC_FILES := ../src/jni_ivymirage.cpp \
 	../src/LogTrace.cpp  \
 	../src/IvyClient.cpp \
 	../src/IvyUtil.cpp \
+	../src/RtpPacket.cpp \
 	../src/MediaSession.cpp \
 	../src/VideoDecode.cpp  \
 	../src/VideoEncode.cpp
