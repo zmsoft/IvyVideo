@@ -7,6 +7,10 @@ bool getSizeDetail(int size, int &width, int &height)
     width = LOW_SIZE_WIDTH;
     height = LOW_SIZE_HEIGHT;
     switch(size) {
+        case SP_THUMB_SIZE:
+            width = THUMB_SIZE_WIDTH;
+            height = THUMB_SIZE_HEIGHT;
+            break;
         case SP_LOW_SIZE:
             width = LOW_SIZE_WIDTH;
             height = LOW_SIZE_HEIGHT;
@@ -113,25 +117,23 @@ bool CropYUVFrame(const char *src, unsigned int src_w, unsigned int src_h, int f
     unsigned int crop_x = (src_w - dst_w);
     unsigned int crop_y = (src_h - dst_h);
 
-    if (format == CSP_I420) 
+    if (format == CSP_I420 || format == CSP_YV12) 
     {
         // for src
         unsigned int src_ysize = src_w * src_h;
-        unsigned int src_usize = (src_ysize>>2);
-        unsigned int src_vsize = (src_ysize>>2);
+        unsigned int src_uvsize = (src_ysize>>1);
 
         unsigned int src_ylinesize = src_w;
-        unsigned int src_ulinesize = (src_ylinesize>>2);
-        unsigned int src_vlinesize = (src_ylinesize>>2);
+        unsigned int src_ulinesize = (src_ylinesize>>1);
+        unsigned int src_vlinesize = (src_ylinesize>>1);
 
         // for dst
         unsigned int dst_ysize = dst_w * dst_h;
-        unsigned int dst_usize = (dst_ysize>>2);
-        unsigned int dst_vsize = (dst_ysize>>2);
+        unsigned int dst_uvsize = (dst_ysize>>1);
 
         unsigned int dst_ylinesize = dst_w;
-        unsigned int dst_ulinesize = (dst_ylinesize>>2);
-        unsigned int dst_vlinesize = (dst_ylinesize>>2);
+        unsigned int dst_ulinesize = (dst_ylinesize>>1);
+        unsigned int dst_vlinesize = (dst_ylinesize>>1);
 
         // copy Y
         const char *src_y = src + (crop_y>>1)*src_ylinesize + (crop_x>>1);
@@ -143,18 +145,18 @@ bool CropYUVFrame(const char *src, unsigned int src_w, unsigned int src_h, int f
         }
 
         // copy U
-        const char *src_u = (src + src_ysize) + (crop_y>>1) * src_ulinesize + (crop_x>>1);
+        const char *src_u = (src + src_ysize) + (crop_y>>2) * src_ulinesize + (crop_x>>1);
         char *dst_u = dst + dst_ysize;
-        for (int k=0; k < dst_h; k++) {
+        for (int k=0; k < (dst_h>>1); k++) {
             memcpy(dst_u, src_u, dst_ulinesize);
             src_u += src_ulinesize;
             dst_u += dst_ulinesize;
         }
 
         // copy V
-        const char *src_v = (src + src_ysize + src_usize) + (crop_y>>1) * src_vlinesize + (crop_x>>1);
-        char *dst_v = dst + dst_ysize + dst_usize;
-        for (int k=0; k < dst_h; k++) {
+        const char *src_v = (src + src_ysize + (src_uvsize>>1)) + (crop_y>>2) * src_vlinesize + (crop_x>>1);
+        char *dst_v = dst + dst_ysize + (dst_uvsize>>1);
+        for (int k=0; k < (dst_h>>1); k++) {
             memcpy(dst_v, src_v, dst_vlinesize);
             src_v += src_vlinesize;
             dst_v += dst_vlinesize;
@@ -167,14 +169,14 @@ bool CropYUVFrame(const char *src, unsigned int src_w, unsigned int src_h, int f
         unsigned int src_uvsize = (src_ysize>>1);
 
         unsigned int src_ylinesize = src_w;
-        unsigned int src_uvlinesize = (src_ylinesize>>1);
+        unsigned int src_uvlinesize = src_ylinesize;
 
         // for dst
         unsigned int dst_ysize = dst_w * dst_h;
         unsigned int dst_uvsize = (dst_ysize>>1);
 
         unsigned int dst_ylinesize = dst_w;
-        unsigned int dst_uvlinesize = (dst_ylinesize>>1);
+        unsigned int dst_uvlinesize = dst_ylinesize;
 
         // copy Y
         const char *src_y = src + (crop_y>>1)*src_ylinesize + (crop_x>>1);
@@ -186,9 +188,9 @@ bool CropYUVFrame(const char *src, unsigned int src_w, unsigned int src_h, int f
         }
 
         // copy U and V
-        const char *src_uv = (src + src_ysize) + (crop_y>>1) * src_uvlinesize + crop_x;
+        const char *src_uv = (src + src_ysize) + (crop_y>>2) * src_uvlinesize + (crop_x>>1);
         char *dst_uv = dst + dst_ysize;
-        for (int k=0; k < dst_h; k++) {
+        for (int k=0; k < (dst_h>>1); k++) {
             memcpy(dst_uv, src_uv, dst_uvlinesize);
             src_uv += src_uvlinesize;
             dst_uv += dst_uvlinesize;
@@ -200,5 +202,55 @@ bool CropYUVFrame(const char *src, unsigned int src_w, unsigned int src_h, int f
     }
 
     return true;
+}
+
+// TODO: 
+bool ScaleYUVFrame(const char *src, unsigned int src_w, unsigned int src_h, int format,
+        char *dst, unsigned int dst_w, unsigned int dst_h)
+{
+    if (!src || !dst) {
+        return false;
+    }
+
+    if (src_w < dst_w || src_h < dst_h) 
+    {
+        return false;
+    }
+
+    if (src_w == dst_w && src_h == dst_h) 
+    {
+        return true;
+    }
+
+    unsigned int scale_x = (src_w - dst_w) / dst_w + 1;
+    unsigned int scale_y = (src_h - dst_h) / dst_h + 1;
+
+    int scale_x_array[5] = {0, 1, 0, 1, 0};
+    int scale_y_array[5] = {0, 1, 0, 1, 0};
+
+    if (format == CSP_I420 || format == CSP_YV12) 
+    {
+        // for src
+        unsigned int src_ysize = src_w * src_h;
+        unsigned int src_usize = (src_ysize>>2);
+        unsigned int src_vsize = (src_ysize>>2);
+
+        unsigned int src_ylinesize = src_w;
+        unsigned int src_ulinesize = (src_ylinesize>>1);
+        unsigned int src_vlinesize = (src_ylinesize>>1);
+
+        // for dst
+        unsigned int dst_ysize = dst_w * dst_h;
+        unsigned int dst_usize = (dst_ysize>>2);
+        unsigned int dst_vsize = (dst_ysize>>2);
+
+        unsigned int dst_ylinesize = dst_w;
+        unsigned int dst_ulinesize = (dst_ylinesize>>1);
+        unsigned int dst_vlinesize = (dst_ylinesize>>1);
+    
+        // scale Y
+   }
+
+    return false;
 }
 
