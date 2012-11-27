@@ -17,18 +17,21 @@ enum ColorSpace_t {
 };
 
 enum SizeProfile_t {
-    SP_LOW_SIZE,        // 90P: 160x90
-    SP_NORMAL_SIZE,     // 180P: 320x180
-    SP_HIGH_SIZE,       // 360P: 640x360
+    SP_THUMB_SIZE,          // 90P: 160x90
+    SP_LOW_SIZE,            // 180P: 320x180
+    SP_NORMAL_SIZE,         // 360P: 640x360
+    SP_HIGH_SIZE,           // 640P: 1280x720
 };
 
 enum SizeDetail_t{
-    LOW_SIZE_WIDTH = 160,
-    LOW_SIZE_HEIGHT = 90,
-    NORMAL_SIZE_WIDTH = 320,
-    NORMAL_SIZE_HEIGHT = 180,
-    HIGH_SIZE_WIDTH = 640,
-    HIGH_SIZE_HEIGHT = 360,
+    THUMB_SIZE_WIDTH    = 160,
+    THUMB_SIZE_HEIGHT   = 90,
+    LOW_SIZE_WIDTH      = 320,
+    LOW_SIZE_HEIGHT     = 180,
+    NORMAL_SIZE_WIDTH   = 640,
+    NORMAL_SIZE_HEIGHT  = 360,
+    HIGH_SIZE_WIDTH     = 1280,
+    HIGH_SIZE_HEIGHT    = 720,
 };
 
 enum FpsProfile_t {

@@ -55,7 +55,7 @@ bool CIvyClient::startSelfVideo()
     // determine the parameters of encoder: fps, resolution, cpu
     int width = 0;
     int height = 0;
-    getSizeDetail(SP_NORMAL_SIZE, width, height);
+    returnf_if_fail(getSizeDetail(SP_LOW_SIZE, width, height));
 
     int fmt = CSP_I420;
     int bandwidth = 512*1024; // kb

@@ -47,7 +47,7 @@ static void write_avc_to_file(char *data, int size)
         return;
     }
 
-    static int once = 190;
+    static int once = 120;
     if (once > 0) {
         once --;
 
@@ -187,7 +187,7 @@ void CVideoEncode::onTimer()
     LOGI("CVideoEncode::onTimer, encoded frame len = %d", size);
     if (size > 0) {
         // maybe rtp pack
-        //write_avc_to_file((char *)mEncoder->getVideoEncodedBuffer(), size);
+        write_avc_to_file((char *)mEncoder->getVideoEncodedBuffer(), size);
         if (mEncodeSink) {
             mEncodeSink->onPacked((char *)mEncoder->getVideoEncodedBuffer(), size, PT_RAW);
         }
