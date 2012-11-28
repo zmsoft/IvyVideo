@@ -1,6 +1,8 @@
 # Makefile
 
-#include config.mak
+ifneq ($(OS),Android)
+include config.mak
+endif
 
 vpath %.c $(SRCPATH)
 vpath %.h $(SRCPATH)

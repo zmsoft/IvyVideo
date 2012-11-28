@@ -1,4 +1,6 @@
-#include $(SUBDIR)../config.mak
+ifneq ($(OS),Android)
+include $(SUBDIR)../config.mak
+endif
 
 NAME = swscale
 FFLIBS = avutil
@@ -21,4 +23,6 @@ TESTPROGS = colorspace
 
 DIRS = bfin mlib ppc sparc x86
 
-#include $(SUBDIR)../subdir.mak
+ifneq ($(OS),Android)
+include $(SUBDIR)../subdir.mak
+endif

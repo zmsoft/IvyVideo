@@ -1,4 +1,6 @@
-#include $(SUBDIR)../config.mak
+ifneq ($(OS),Android)
+include $(SUBDIR)../config.mak
+endif
 
 NAME = avformat
 FFLIBS = avcodec avutil
@@ -269,6 +271,8 @@ OBJS-$(CONFIG_JACK_INDEV)                += timefilter.o
 EXAMPLES  = output
 TESTPROGS = timefilter
 
-#include $(SUBDIR)../subdir.mak
+ifneq ($(OS),Android)
+include $(SUBDIR)../subdir.mak
+endif
 
 $(SUBDIR)output-example$(EXESUF): ELIBS = -lswscale
