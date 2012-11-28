@@ -1,13 +1,19 @@
 TARGET := libyuv
 SUFFIX := so
 LIBDIRS :=
-LIBS := pthread rt
+LIBS := 
 
-OS=Linux
+OS=Android
 ARCH=
+ARCH_ABI=
 
-ifeq ($(OS),Linux)
+ifeq ($(OS),Android)
+CC := /opt/arm-linux-androideabi-4.6/bin/arm-linux-androideabi-g++
+CXX := $(CC)
+AR := ar crs
+else
 CC := g++
+CXX := $(CC)
 AR := ar crs
 endif
 
@@ -61,7 +67,6 @@ SOURCE := \
 
 # TODO(fbarchard): Enable mjpeg encoder.
 #   source/mjpeg_decoder.cc
-
 ifeq ($(ARCH_ABI),armeabi-v7a)
 CPPFLAGS += -DLIBYUV_NEON
 SOURCE += \
