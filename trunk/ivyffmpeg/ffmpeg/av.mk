@@ -1,9 +1,9 @@
 # LOCAL_PATH is one of libavutil, libavcodec, libavformat, or libswscale
 
+OS := Android
 include $(LOCAL_PATH)/../config-$(TARGET_ARCH).mak
 include $(LOCAL_PATH)/../config.mak
 
-OS := Android
 OBJS :=
 OBJS-yes :=
 MMX-OBJS-yes :=
