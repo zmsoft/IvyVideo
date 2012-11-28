@@ -92,8 +92,7 @@ bool CVideoEncode::init(int width, int height, int fmt, int fps, int bandwidth, 
 
     if(mEncoder->open() != 0) {
         LOGE("CVideoEncode.init(), failed to open FFmpegEncoder: %s", codec);
-        delete mEncoder;
-        mEncoder = NULL;
+        SAFE_DELETE(mEncoder);
         return false;
     }
 
@@ -105,15 +104,38 @@ void CVideoEncode::uninit()
 {
     LOGI("CVideoEncode.uninit() begin");
     mMutex.on();
-
-    if (mEncoder) {
-        mEncoder->close();
-        delete mEncoder;
-        mEncoder = NULL;
-    }
-
+    SAFE_DELETE(mEncoder);
     mMutex.off();
     LOGI("CVideoEncode.uninit() end");
+}
+
+//
+// must be called under protection of mMutex,
+// and its ref count is always kept: 1
+CSample *CVideoEncode::getSample(int size, bool need_alloc)
+{
+    CSample *pSample = NULL;
+    if (need_alloc) {
+        size = (size <= 0) ? 1 : size; 
+        if (mSample) {
+            if (mSample->getCapacity() < size) {
+                SAFE_RELEASE(mSample);
+            }
+        }
+
+        if (mSample == NULL) {
+            mSample = CSampleAllocator::inst()->allocSample(size);
+            returnv_if_fail(mSample != NULL, NULL);
+            mSample->addRef();
+        }
+        pSample = mSample;
+    }else {
+        returnv_if_fail(mSample != NULL, NULL);
+        pSample = mSample;
+        mSample = NULL;
+    }
+
+    return pSample;
 }
 
 void CVideoEncode::onRawFrame(char *data, int size, RawFrameFormat &inFmt)
@@ -122,43 +144,59 @@ void CVideoEncode::onRawFrame(char *data, int size, RawFrameFormat &inFmt)
         mEncodeParam.width, mEncodeParam.height, inFmt.width, inFmt.height, size);
     return_if_fail(inFmt.fmt == ANDROID_NV21);
 
-    // crop frame
+    // encoding frame info
     int frameWidth = mEncodeParam.width;
     int frameHeight = mEncodeParam.height;
     int frameSize = frameWidth * frameHeight * 3 / 2;
 
+#if HAVE_LIBYUV
+    // (a) nv21 to i420 (b) scale i420
+    CSample *pSample = CSampleAllocator::inst()->allocSample(size);
+    return_if_fail(pSample != NULL);
+    pSample->addRef();
+
+    do{
+        break_if_fail(pSample->setDataSize(size));
+        break_if_fail(NV21toI420(data, pSample->getDataPtr(), inFmt.width, inFmt.height));
+
+        CAutoLock lock(mMutex);
+        CSample *pEncSample = getSample(frameSize);
+        break_if_fail(pEncSample != NULL);
+
+        break_if_fail(pEncSample->setDataSize(frameSize));
+        pEncSample->setFormat(frameWidth, frameHeight, CSP_I420);
+
+        break_if_fail(ScaleYUVFrame(pSample->getDataPtr(), inFmt.width, inFmt.height, CSP_I420, 
+                    pEncSample->getDataPtr(), frameWidth, frameHeight));
+        write_raw_to_file(pEncSample->getDataPtr(), pEncSample->getDataSize());
+    }while(0);
+
+    SAFE_RELEASE(pSample);
+#else
+    // (a) crop i420 (b) nv21 to i420
     CSample *pSample = CSampleAllocator::inst()->allocSample(frameSize);
     return_if_fail(pSample != NULL);
     pSample->addRef();
 
-    pSample->setDataSize(frameSize);
-    bool bret = CropYUVFrame(data, inFmt.width, inFmt.height, CSP_NV21, 
-            pSample->getDataPtr(), frameWidth, frameHeight);
-    if (!bret) {
-        pSample->release();
-        LOGE("CVideoEncode.onRawFrame(), failed to CropYUVFrame");
-        return;
-    }
-    write_raw_to_file(pSample->getDataPtr(), pSample->getDataSize());
+    do {
+        break_if_fail(pSample->setDataSize(frameSize));
+        break_if_fail(CropYUVFrame(data, inFmt.width, inFmt.height, CSP_NV21, 
+            pSample->getDataPtr(), frameWidth, frameHeight));
+        write_raw_to_file(pSample->getDataPtr(), pSample->getDataSize());
 
-    CAutoLock lock(mMutex);
-    if (mSample) {
-        if (mSample->getCapacity() < frameSize) {
-            mSample->release();
-            mSample = NULL;
-        }
-    }
-
-    if (mSample == NULL) {
-        mSample = CSampleAllocator::inst()->allocSample(frameSize);
-        return_if_fail(mSample != NULL);
-        mSample->addRef();
-    }
+        CAutoLock lock(mMutex);
+        CSample *pEncSample = getSample(frameSize);
+        break_if_fail(pEncSample != NULL);
     
-    mSample->setFormat(frameWidth, frameHeight, CSP_I420);
-    return_if_fail(mSample->setDataSize(frameSize));
-    return_if_fail(NV21toI420(pSample->getDataPtr(), mSample->getDataPtr(), mSample->mWidth, mSample->mHeight));
-    pSample->release();
+        break_if_fail(pEncSample->setDataSize(frameSize));
+        pEncSample->setFormat(frameWidth, frameHeight, CSP_I420);
+
+        break_if_fail(NV21toI420(pSample->getDataPtr(), 
+                    pEncSample->getDataPtr(), frameWidth, frameHeight));
+    }while(0);
+
+    SAFE_RELEASE(pSample);
+#endif
 }
 
 // 
@@ -168,15 +206,10 @@ void CVideoEncode::onTimer()
     return_if_fail(mEncoder != NULL);
 
     CSample *pSample = NULL;
-    mMutex.on();
-    if (mSample) {
-        pSample = mSample;
-        mSample = NULL;
-        pSample->addRef();
+    {
+        CAutoLock lock(mMutex);
+        return_if_fail((pSample=getSample(0, false)) != NULL);;
     }
-    mMutex.off();
-
-    return_if_fail(pSample != NULL);
 
     int pixFmt = -1;
     return_if_fail(getPixelFormat(pSample->getFormat(), pixFmt));
@@ -192,6 +225,6 @@ void CVideoEncode::onTimer()
             mEncodeSink->onPacked((char *)mEncoder->getVideoEncodedBuffer(), size, PT_RAW);
         }
     }
-    pSample->release();
+    SAFE_RELEASE(pSample);
 }
 

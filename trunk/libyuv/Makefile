@@ -1,5 +1,5 @@
 TARGET := libyuv
-SUFFIX := so
+SUFFIX := a
 LIBDIRS :=
 LIBS := 
 
@@ -8,14 +8,15 @@ ARCH=
 ARCH_ABI=
 
 ifeq ($(OS),Android)
-CC := /opt/arm-linux-androideabi-4.6/bin/arm-linux-androideabi-g++
-CXX := $(CC)
-AR := ar crs
+HOST := /opt/arm-linux-androideabi-4.6/bin/arm-linux-androideabi-
 else
-CC := g++
-CXX := $(CC)
-AR := ar crs
+HOST :=
 endif
+
+CC := $(HOST)g++
+CXX := $(CC)
+AR := $(HOST)ar crs
+
 
 RM := rm -f
 PS := cc
