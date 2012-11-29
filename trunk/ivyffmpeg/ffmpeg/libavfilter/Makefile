@@ -1,4 +1,6 @@
-#include $(SUBDIR)../config.mak
+ifneq ($(OS),Android)
+include $(SUBDIR)../config.mak
+endif
 
 NAME = avfilter
 FFLIBS = avcodec avutil swscale
@@ -20,4 +22,6 @@ OBJS-$(CONFIG_SCALE_FILTER)                  += vf_scale.o
 OBJS-$(CONFIG_SLICIFY_FILTER)                += vf_slicify.o
 OBJS-$(CONFIG_VFLIP_FILTER)                  += vf_vflip.o
 
-#include $(SUBDIR)../subdir.mak
+ifneq ($(OS),Android)
+include $(SUBDIR)../subdir.mak
+endif

@@ -1,5 +1,6 @@
 # LOCAL_PATH is libx264
 
+OS := Android
 include $(LOCAL_PATH)/config-$(TARGET_ARCH).mak
 include $(LOCAL_PATH)/config.mak
 

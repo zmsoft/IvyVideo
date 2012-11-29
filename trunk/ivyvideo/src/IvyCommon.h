@@ -81,8 +81,16 @@ enum AndroidCSP_t {
 #define returnv_if_fail(p, v)   do { if(!(p)) {return (v);} } while(0)
 #endif
 
+#ifndef break_if_fail
+#define break_if_fail(p)        { if(!(p)) {break;} }
+#endif
+
+#ifndef SAFE_DELETE
+#define SAFE_DELETE(p)          do {if (p) {delete (p); (p) = NULL;} } while(0)
+#endif
+
 #ifndef SAFE_RELEASE
-#define SAFE_RELEASE(p)         do {if (p) {delete p; p = NULL;} } while(0)
+#define SAFE_RELEASE(p)         do {if (p) {(p)->release(); (p) = NULL;} } while(0)
 #endif
 
 

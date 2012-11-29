@@ -28,6 +28,9 @@ protected:
     // for CTimer
     virtual void onTimer();
 
+private:    
+    CSample *getSample(int size, bool need_alloc=true);
+
 private:
     CMutex mMutex;
     CSample *mSample;

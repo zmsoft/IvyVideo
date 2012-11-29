@@ -1,4 +1,6 @@
-#include $(SUBDIR)../config.mak
+ifneq ($(OS),Android)
+include $(SUBDIR)../config.mak
+endif
 
 NAME = avcodec
 FFLIBS = avutil
@@ -692,7 +694,9 @@ DIRS = alpha arm bfin mlib ppc ps2 sh4 sparc x86
 
 CLEANFILES = sin_tables.c cos_tables.c *_tables.h *_tablegen$(HOSTEXESUF)
 
-#include $(SUBDIR)../subdir.mak
+ifneq ($(OS),Android)
+include $(SUBDIR)../subdir.mak
+endif
 
 $(SUBDIR)dct-test$(EXESUF): $(SUBDIR)dctref.o
 

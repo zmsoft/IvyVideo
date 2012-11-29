@@ -2,6 +2,10 @@
 #include "IvyCommon.h"
 #include "libavformat/avformat.h"
 
+#if HAVE_LIBYUV
+#include "libyuv.h"
+#endif
+
 bool getSizeDetail(int size, int &width, int &height)
 {
     width = LOW_SIZE_WIDTH;
@@ -232,23 +236,37 @@ bool ScaleYUVFrame(const char *src, unsigned int src_w, unsigned int src_h, int 
     {
         // for src
         unsigned int src_ysize = src_w * src_h;
-        unsigned int src_usize = (src_ysize>>2);
-        unsigned int src_vsize = (src_ysize>>2);
+        unsigned int src_uvsize = (src_ysize>>1);
 
         unsigned int src_ylinesize = src_w;
-        unsigned int src_ulinesize = (src_ylinesize>>1);
-        unsigned int src_vlinesize = (src_ylinesize>>1);
+        unsigned int src_uvlinesize = src_ylinesize;
 
         // for dst
         unsigned int dst_ysize = dst_w * dst_h;
-        unsigned int dst_usize = (dst_ysize>>2);
-        unsigned int dst_vsize = (dst_ysize>>2);
+        unsigned int dst_uvsize = (dst_ysize>>1);
 
         unsigned int dst_ylinesize = dst_w;
-        unsigned int dst_ulinesize = (dst_ylinesize>>1);
-        unsigned int dst_vlinesize = (dst_ylinesize>>1);
+        unsigned int dst_uvlinesize = dst_ylinesize;
     
-        // scale Y
+        // scale
+#if HAVE_LIBYUV 
+        const uint8 * src_y = (const uint8 *)src;
+        const uint8 * src_u = src_y + src_ysize;
+        const uint8 * src_v = src_y + src_ysize + (src_uvsize>>1);
+
+        uint8 * dst_y = (uint8 *)dst;
+        uint8 * dst_u = dst_y + dst_ysize;
+        uint8 * dst_v = dst_y + dst_ysize + (dst_uvsize>>1);
+
+        if(libyuv::I420Scale(src_y, src_ylinesize, src_u, (src_uvlinesize>>1), src_v, (src_uvlinesize>>1), 
+                             src_w, src_h,
+                             dst_y, dst_ylinesize, dst_u, (dst_uvlinesize>>1), dst_v, (dst_uvlinesize>>1),
+                             dst_w, dst_h,
+                             libyuv::kFilterNone) == 0) 
+        {
+            return true;
+        }
+#endif
    }
 
     return false;

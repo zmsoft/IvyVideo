@@ -38,13 +38,15 @@ LOCAL_SHARED_LIBRARIES :=
 LOCAL_LDLIBS := -llog
 LOCAL_LDLIBS += -L$(EXT_PATH)/ivyffmpeg/build/libs/armeabi-v7a -livyffmpeg
 LOCAL_LDLIBS += -L$(EXT_PATH)/sgsclient -lsgsclient
+LOCAL_LDLIBS += -L$(EXT_PATH)/libyuv -lyuv
 
 LOCAL_C_INCLUDES := 		\
 	$(LOCAL_PATH)		\
 	$(EXT_PATH)/ivyffmpeg/ffmpeg 		\
 	$(EXT_PATH)/ivyffmpeg/src 		\
-	$(EXT_PATH)/sgsclient
+	$(EXT_PATH)/sgsclient			\
+	$(EXT_PATH)/libyuv/include
 
-LOCAL_CFLAGS := -DANDROID
+LOCAL_CFLAGS := -DANDROID -DHAVE_LIBYUV=1
 
 include $(BUILD_SHARED_LIBRARY)

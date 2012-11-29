@@ -1,4 +1,6 @@
-#include $(SUBDIR)../config.mak
+ifneq ($(OS),Android)
+include $(SUBDIR)../config.mak
+endif
 
 NAME = avutil
 
@@ -46,6 +48,8 @@ TESTPROGS-$(HAVE_LZO1X_999_COMPRESS) += lzo
 
 DIRS = arm bfin sh4 x86
 
-#include $(SUBDIR)../subdir.mak
+ifneq ($(OS),Android)
+include $(SUBDIR)../subdir.mak
+endif
 
 $(SUBDIR)lzo-test$(EXESUF): ELIBS = -llzo2
