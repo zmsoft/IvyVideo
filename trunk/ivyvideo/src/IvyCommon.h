@@ -85,6 +85,27 @@ enum AndroidCSP_t {
 #define break_if_fail(p)        { if(!(p)) {break;} }
 #endif
 
+#if defined __STDC_VERSION__ && __STDC_VERSION__ >= 199901L
+#define __FUNC__    __func__
+#else
+#define __FUNC__    ((__const char *) 0)
+#endif
+
+#ifndef assertp
+#define assert_print(...)   { fprintf(stderr, __VA_ARGS__); fprintf(stderr, "\n"); }
+#define assertp(p)          do { \
+                                 if(!(p)) { \
+                                     assert_print("(%s) failed in [%s:%d::%s()]", #p, __FILE__, __LINE__, __FUNC__); \
+                                 } \
+                            } while(0)
+#define assertv(p, v)       do { \
+                                 if(!(p)) { \
+                                     assert_print("(%s) failed in [%s:%d::%s()]", #p, __FILE__, __LINE__, __FUNC__); \
+                                     return (v); \
+                                 } \
+                            } while(0)
+#endif
+
 #ifndef SAFE_DELETE
 #define SAFE_DELETE(p)          do {if (p) {delete (p); (p) = NULL;} } while(0)
 #endif
