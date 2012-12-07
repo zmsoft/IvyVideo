@@ -32,6 +32,18 @@ void CMediaSession::uninit()
     uninitSGSClient();
 }
 
+void CMediaSession::setUserProfile(const std::string &name, const std::string &passwd)
+{
+    mName = name;
+    mPassword = passwd;
+}
+
+void CMediaSession::setServiceHost(const std::string &host, unsigned short port)
+{
+    mHost = host;
+    mPort = port;
+}
+
 int CMediaSession::joinSession()
 {
     return 0;

@@ -22,6 +22,9 @@ public:
     bool init();
     void uninit();
 
+    void setUserProfile(const std::string &name, const std::string &passwd);
+    void setServiceHost(const std::string &host, unsigned short port);
+
     int joinSession();
     void leaveSession();
     void sendMessage();
@@ -43,12 +46,15 @@ protected:
 private:
     IvyMediaSessionSink *mSink;
 
+    // user profile
     std::string mName;
     std::string mPassword;
 
+    // service host info
     std::string mHost;
     unsigned short mPort;
 
+    // for sgs protocol
     sgs_context *mContext;
     sgs_connection *mConnection;
     sgs_connection *mSession;
