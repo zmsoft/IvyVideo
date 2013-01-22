@@ -106,6 +106,7 @@ sgs_context* sgs_ctx_create(const char* hostname, const int port,
 sgs_context* sgs_ctx_create_ex(const char* hostname, const int port, void *priv,
     void (*reg_fd)(sgs_connection*, sgs_socket_t, short),
     void (*unreg_fd)(sgs_connection*, sgs_socket_t, short));
+void *sgs_context_get_priv(sgs_context *ctx);
 
 /*
  * function: sgs_ctx_set_channel_joined_cb()
