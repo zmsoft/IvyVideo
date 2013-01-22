@@ -38,10 +38,19 @@ protected:
     static void disconnected_cb(sgs_connection *conn);
     static void logged_in_cb(sgs_connection *conn, sgs_session *session);
     static void login_failed_cb(sgs_connection *conn, const uint8_t *msg, size_t msglen);
+           void loginFailedCB(sgs_connection *conn, const uint8_t *msg, size_t msglen);
+
     static void reconnected_cb(sgs_connection *conn);
+           void reconnectedCB(sgs_connection *conn);
+
     static void recv_msg_cb(sgs_connection *conn, const uint8_t *msg, size_t msglen);
+           void recvMsgCB(sgs_connection *conn, const uint8_t *msg, size_t msglen);
+
     static void register_fd_cb(sgs_connection *conn, int fd, short events);
+           void registerFdCB(sgs_connection *conn, int fd, short events);
+
     static void unregister_fd_cb(sgs_connection *conn, int fd, short events);
+           void unregisterFdCB(sgs_connection *conn, int fd, short events);
 
 private:
     IvyMediaSessionSink *mSink;
@@ -60,9 +69,11 @@ private:
     sgs_connection *mSession;
     sgs_channel *mChannel;
 
+protected:
     fd_set mReadSet;
     fd_set mWriteSet;
     fd_set mExceptSet;
+    int mMaxFd;
 };
 
 #endif

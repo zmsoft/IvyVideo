@@ -110,6 +110,13 @@ sgs_context_impl *sgs_ctx_create_ex(const char *hostname, const int port, void *
     return ctx;
 }
 
+void *sgs_context_get_priv(sgs_context *ctx) {
+    if (ctx) {
+        return ctx->priv;
+    }
+    return NULL;
+}
+
 /*
  * sgs_ctx_set_channel_joined_cb()
  */
