@@ -158,6 +158,9 @@ static av_cold int X264_init(AVCodecContext *avctx)
     // fix ffmpeg
     if (avctx->gop_size == 12) avctx->gop_size = 20;
 
+    // fix ffmpeg
+    x4->params.rc.i_lookahead = 1;
+
     x4->params.i_keyint_max         = avctx->gop_size;
     x4->params.rc.i_bitrate         = avctx->bit_rate       / 1000;
     x4->params.rc.i_vbv_buffer_size = avctx->rc_buffer_size / 1000;
