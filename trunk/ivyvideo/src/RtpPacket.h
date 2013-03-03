@@ -9,8 +9,9 @@
 
 #define RTP_VERSION         2
 #define MAX_RTP_SIZE        1200
-#define MAX_NALU_SIZE       1136
 #define MAX_RTPHEAD_SIZE    64
+#define MAX_RTPDATA_SIZE	(MAX_RTP_SIZE - MAX_RTPHEAD_SIZE)
+#define MAX_NALU_SIZE       (MAX_RTPDATA_SIZE<<1)
 
 typedef struct {
     unsigned int v:2;         /* protocol version */

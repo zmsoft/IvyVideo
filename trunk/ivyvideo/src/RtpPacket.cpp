@@ -13,8 +13,8 @@ CRtpPacket::~CRtpPacket()
 
 bool CRtpPacket::packSglData(const char *data, int len, char *sglPkt, int &sglLen, int type, int seq, int ts)
 {
-    returnf_if_fail((data != NULL) && (len <= MAX_NALU_SIZE));
-    returnf_if_fail((sglPkt != NULL) && (sglLen >= (len + MAX_RTPHEAD_SIZE)));
+    returnf_if_fail((data != NULL) && (len <= MAX_RTPDATA_SIZE));
+    returnf_if_fail((sglPkt != NULL) && (sglLen >= MAX_RTP_SIZE));
     returnf_if_fail((seq >= 0) && (seq <= 65535));
 
     memset(sglPkt, 0, sglLen);
@@ -39,11 +39,11 @@ bool CRtpPacket::packFuData(const char *data, int len, char *&fuPkt, int *&fuLen
 {
     returnf_if_fail((data != NULL) && (len <= MAX_NALU_SIZE));
     returnf_if_fail((fuPkt[0] != NULL) && (fuPkt[1] != NULL));
-    returnf_if_fail(fuLen[0] >= (len + MAX_RTPHEAD_SIZE));
-    returnf_if_fail(fuLen[1] >= (len + MAX_RTPHEAD_SIZE));
+    returnf_if_fail(fuLen[0] >= MAX_RTP_SIZE);
+    returnf_if_fail(fuLen[1] >= MAX_RTP_SIZE);
     returnf_if_fail((seq >= 0) && (seq <= 65535));
 
-    return false;
+    return true;
 }
 
 char *CRtpPacket::getHead()

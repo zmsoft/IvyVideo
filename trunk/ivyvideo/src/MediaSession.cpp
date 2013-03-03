@@ -32,8 +32,21 @@ void CMediaSession::uninit()
     uninitSGSClient();
 }
 
+void CMediaSession::setUserProfile(const std::string &name, const std::string &passwd)
+{
+    mName = name;
+    mPassword = passwd;
+}
+
+void CMediaSession::setServiceHost(const std::string &host, unsigned short port)
+{
+    mHost = host;
+    mPort = port;
+}
+
 int CMediaSession::joinSession()
 {
+
     return 0;
 }
 
@@ -100,7 +113,10 @@ bool CMediaSession::uninitSGSClient()
 }
 
 void CMediaSession::channel_joined_cb(sgs_connection *conn, sgs_channel *channel)
-{}
+{
+    const char *channelName = sgs_channel_name(channel);
+    //sgs_channel_send(channel, messageBuffer, strlen(buf)); // send login success
+}
 
 void CMediaSession::channel_left_cb(sgs_connection *conn, sgs_channel *channel)
 {}
@@ -124,8 +140,59 @@ void CMediaSession::recv_msg_cb(sgs_connection *conn, const uint8_t *msg, size_t
 {}
 
 void CMediaSession::register_fd_cb(sgs_connection *conn, int fd, short events)
-{}
+{
+    sgs_context *ctx = sgs_connection_get_context(conn);
+    CMediaSession *thiz = (CMediaSession *) sgs_context_get_priv(ctx);
+    return_if_fail(thiz);
+}
+
+void CMediaSession::registerFdCB(sgs_connection *conn, int fd, short events)
+{
+    if ((events & POLLIN) == POLLIN)
+        FD_SET(fd, &mReadSet);
+
+    if ((events & POLLOUT) == POLLOUT)
+        FD_SET(fd, &mWriteSet);
+
+    if ((events & POLLERR) == POLLERR)
+        FD_SET(fd, &mExceptSet);
+
+    if (fd > mMaxFd) mMaxFd = fd;
+}
 
 void CMediaSession::unregister_fd_cb(sgs_connection *conn, int fd, short events)
-{}
+{
+    sgs_context *ctx = sgs_connection_get_context(conn);
+    CMediaSession *thiz = (CMediaSession *) sgs_context_get_priv(ctx);
+    return_if_fail(thiz);
+    thiz->unregisterFdCB(conn, fd, events);
+}
+
+void CMediaSession::unregisterFdCB(sgs_connection *conn, int fd, short events)
+{
+    int i, new_max;
+
+    if ((events & POLLIN) == POLLIN)
+        FD_CLR(fd, &mReadSet);
+
+    if ((events & POLLOUT) == POLLOUT)
+        FD_CLR(fd, &mWriteSet);
+
+    if ((events & POLLERR) == POLLERR)
+        FD_CLR(fd, &mExceptSet);
+
+    /** Check if a new max-fd needs to be calculated. */
+    if (fd == mMaxFd) {
+        new_max = 0;
+
+        for (i = 0; i <= mMaxFd; i++) {
+            if (FD_ISSET(i, &mReadSet) ||
+                    FD_ISSET(i, &mWriteSet) ||
+                    FD_ISSET(i, &mExceptSet))
+                new_max = i;
+        }
+
+        mMaxFd = new_max;
+    }
+}
 

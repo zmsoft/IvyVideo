@@ -62,6 +62,7 @@
 static void conn_closed(sgs_connection_impl *connection);
 static int consume_data(sgs_connection_impl *connection);
 
+
 /*
  * sgs_connection_do_work()
  */
