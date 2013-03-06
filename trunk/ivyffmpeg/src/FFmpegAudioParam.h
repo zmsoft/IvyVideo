@@ -3,7 +3,7 @@
 
 #include <string>
 
-#ifdef WIN32
+#ifdef WIN32_FF_DLL
 #ifdef DLL_FILE
 #   define FFMPEG_EXPORT _declspec(dllexport)
 #else
