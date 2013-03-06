@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "FFmpegVideoParam.h"
 
 FFmpegVideoParam::FFmpegVideoParam(int width, int height, PixelFormat pixelFormat, int bitRate, int frameRate, std::string videoCodecName) :
