@@ -7,8 +7,8 @@
 	--enable-postproc \
 	--enable-pthreads --disable-mpegaudio-hp --disable-ipv6 \
 	--disable-altivec --disable-amd3dnow --disable-amd3dnowext \
-	--disable-mmx --disable-mmx2 --disable-sse --disable-ssse3 \
-	--disable-debug --disable-optimizations --disable-stripping \
+	--enable-mmx --enable-mmx2 --disable-sse --disable-ssse3 --disable-memalign-hack \
+	--disable-debug --enable-optimizations --disable-stripping \
 	--enable-zlib \
 	--disable-bsfs --disable-devices --disable-outdevs --disable-indevs --disable-hwaccels \
 	--disable-encoders \

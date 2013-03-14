@@ -156,7 +156,7 @@ static av_cold int X264_init(AVCodecContext *avctx)
     x4->params.p_log_private        = avctx;
 
     // fix ffmpeg
-    if (avctx->gop_size == 12) avctx->gop_size = 20;
+    //if (avctx->gop_size == 12) avctx->gop_size = 20;
 
     // fix ffmpeg
     x4->params.rc.i_lookahead = 1;
@@ -201,10 +201,10 @@ static av_cold int X264_init(AVCodecContext *avctx)
     x4->params.i_deblocking_filter_beta    = avctx->deblockbeta;
 
     // fix ffmpeg
-    if (avctx->qmin == 2)  avctx->qmin = 5;
-    if (avctx->qmax == 31) avctx->qmax = 36;
-    if (avctx->max_qdiff == 3) avctx->max_qdiff = 4;
-    if (avctx->qcompress == 0.5) avctx->qcompress = 0.6f;
+    //if (avctx->qmin == 2)  avctx->qmin = 5;
+    //if (avctx->qmax == 31) avctx->qmax = 36;
+    //if (avctx->max_qdiff == 3) avctx->max_qdiff = 4;
+    //if (avctx->qcompress == 0.5) avctx->qcompress = 0.6f;
 
     x4->params.rc.i_qp_min                 = avctx->qmin;
     x4->params.rc.i_qp_max                 = avctx->qmax;
@@ -254,7 +254,7 @@ static av_cold int X264_init(AVCodecContext *avctx)
     else x4->params.analyse.i_me_method = X264_ME_HEX;
 
     // fix ffmpeg, 0 is no limit
-    if (avctx->me_range == 0) avctx->me_range = 16;
+    //if (avctx->me_range == 0) avctx->me_range = 16;
 
     x4->params.analyse.i_me_range         = avctx->me_range;
     x4->params.analyse.i_subpel_refine    = avctx->me_subpel_quality;
